@@ -1,0 +1,4 @@
+name: 'fine-mapping'
+repo: 'http://github.com/gaow/fine-mapping'
+footer: "Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago"
+include_dir: ['workflow']

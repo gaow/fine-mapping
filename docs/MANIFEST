@@ -1,0 +1,7 @@
+docs/index.html
+docs/index.tpl
+docs/js/docs.js
+docs/workflow.html
+docs/workflow.tpl
+docs/workflow/summary_statistics_finemapping.html
+docs/workflow/summary_statistics_wrangler.html

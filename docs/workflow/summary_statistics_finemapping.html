@@ -1,0 +1,746 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="ipynb_website:version" content="0.9.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" type="text/css" href="../css/jt.css">
+
+<link rel="stylesheet" type="text/css" href="../css/toc2.css">
+
+<link href="../site_libs/jqueryui-1.11.4/jquery-ui.css">
+<link rel="stylesheet" href="../site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="../site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<link rel="stylesheet"
+      href="../site_libs/highlightjs/null.min.css"
+      type="text/css" />
+
+<script src="../site_libs/highlightjs/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+<script src="../js/doc_toc.js"></script>
+<script src="../js/docs.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+        },
+        "HTML-CSS": {
+            preferredFont: "TeX",
+            availableFonts: ["TeX"],
+            styles: {
+                scale: 110,
+                ".MathJax_Display": {
+                    "font-size": "110%",
+                }
+            }
+        }
+    });
+</script>
+<script>
+function filterDataFrame(id) {
+    var input = document.getElementById("search_" + id);
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("dataframe_" + id);
+    var tr = table.getElementsByTagName("tr");
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < tr.length; i++) {
+        for (var j = 0; j < tr[i].cells.length; ++j) {
+            var matched = false;
+            if (tr[i].cells[j].innerHTML.toUpperCase().indexOf(filter) != -1) {
+                tr[i].style.display = "";
+                matched = true
+                break;
+            }
+            if (!matched)
+                tr[i].style.display = "none";
+        }
+    }
+}
+function sortDataFrame(id, n, dtype) {
+    var table = document.getElementById("dataframe_" + id);
+    var tb = table.tBodies[0]; // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
+    var tr = Array.prototype.slice.call(tb.rows, 0); // put rows into array
+    if (dtype === 'numeric') {
+        var fn = function(a, b) { 
+            return parseFloat(a.cells[n].textContent) <= parseFloat(b.cells[n].textContent) ? -1 : 1;
+        }
+    } else {
+        var fn = function(a, b) {
+            var c = a.cells[n].textContent.trim().localeCompare(b.cells[n].textContent.trim()); 
+            return c > 0 ? 1 : (c < 0 ? -1 : 0) }
+    }
+    var isSorted = function(array, fn) {
+        if (array.length < 2)
+            return 1;
+        var direction = fn(array[0], array[1]); 
+        for (var i = 1; i < array.length - 1; ++i) {
+            var d = fn(array[i], array[i+1]);
+            if (d == 0)
+                continue;
+            else if (direction == 0)
+                direction = d;
+            else if (direction != d)
+                return 0;
+            }
+        return direction;
+    }
+    var sorted = isSorted(tr, fn);
+    if (sorted == 1 || sorted == -1) {
+        // if sorted already, reverse it
+        for(var i = tr.length - 1; i >= 0; --i)
+            tb.appendChild(tr[i]); // append each row in order
+    } else {
+        tr = tr.sort(fn);
+        for(var i = 0; i < tr.length; ++i)
+            tb.appendChild(tr[i]); // append each row in order
+    }
+}
+</script>
+
+<script>
+$( document ).ready(function(){
+            var cfg={'threshold':3,     // depth of toc (number of levels)
+             'number_sections': false,
+             'toc_cell': false,          // useless here
+             'toc_window_display': true, // display the toc window
+             "toc_section_display": "block", // display toc contents in the window
+             'sideBar':true,       // sidebar or floating window
+             'navigate_menu':false       // navigation menu (only in liveNotebook -- do not change)
+            }
+            var st={};                  // some variables used in the script
+            st.rendering_toc_cell = false;
+            st.config_loaded = false;
+            st.extension_initialized=false;
+            st.nbcontainer_marginleft = $('#notebook-container').css('margin-left')
+            st.nbcontainer_marginright = $('#notebook-container').css('margin-right')
+            st.nbcontainer_width = $('#notebook-container').css('width')
+            st.oldTocHeight = undefined
+            st.cell_toc = undefined;
+            st.toc_index=0;
+            // fire the main function with these parameters
+            table_of_contents(cfg, st);
+            var file=workflowDict[$("h1:first").attr("id")];
+            $("#toc-level0 a").css("color","#126dce");
+            $('a[href="#'+$("h1:first").attr("id")+'"]').hide()
+            var docs=workflowArray;
+            var docs_map=workflowArrayMap;
+            var pos=workflowArray.indexOf(file);
+            for (var a=pos;a>=0;a--){
+                  $('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>').insertBefore("#toc-level0 li:eq(0)");
+            }
+            $('a[href="'+file+'.html'+'"]').css("color","#126dce");
+            for (var a=pos+1;a<docs.length;a++){
+                  $(".toc #toc-level0").append('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>');
+            }
+            // $("#toc-header").hide(); // comment out because it prevents search bar from displaying
+    });
+</script>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+  // mark it active
+  menuAnchor.parent().addClass('active');
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+<div class="container-fluid main-container">
+<!-- tabsets -->
+<script src="../site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+
+
+<title>fine-mapping</title>
+
+<style type = "text/css">
+body {
+  font-family: "Droid Sans";
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+</style>
+</head>
+
+<body>
+<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="container" id="notebook-container">
+
+<!-- code folding -->
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html">fine-mapping</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+<li>
+  <a href="../index.html">Overview</a>
+</li>
+        
+<li>
+  <a href="../workflow.html">Workflow</a>
+</li>
+        
+      </ul>
+        
+<ul class="nav navbar-nav navbar-right">
+<li>
+   <a href="http://github.com/gaow/fine-mapping"> <span class="fa fa-github"></span> </a>
+</li>
+</ul>
+        
+      </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Fine-mapping-workflow-using-summary-statistics">Fine-mapping workflow using summary statistics<a class="anchor-link" href="#Fine-mapping-workflow-using-summary-statistics">&#182;</a></h1><p>Here I implement a workflow that does summary statistics fine-mapping using SuSiE and DAP-G.</p>
+<p>SuSiE is implemented in <a href="https://github.com/stephenslab/susieR"><code>susieR</code></a> (please use version 0.6.1+).</p>
+<p>Since we need to analyze the data with both SuSiE and DAP-G we make input format compatible with DAP-G (SuSiE, implemented in R, is more flexible in input format).</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>update SoS and sos-notebook</p>
+
+<pre><code>cd ~/GIT/software/SoS
+git pull
+pip install ./</code></pre>
+
+<pre><code>cd ~/GIT/
+git clone https://github.com/stephenslab/susieR.git
+cd susieR/
+R
+devtools::install_github("stephenslab/susieR")
+# devtools::install_github("stephenslab/dsc", subdir = "dscrutils", force = TRUE)</code></pre>
+
+<pre><code>sudo apt-get install libgsl-dev</code></pre>
+
+<pre><code>cd ~/GIT/exec/
+mv ../atac-gwas/dap-g ./
+source .bashrc</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">~/</span><span class="n">GIT</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">fine</span><span class="o">-</span><span class="n">mapping</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/gaow/Documents/GIT/github/fine-mapping</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="The-workflow">The workflow<a class="anchor-link" href="#The-workflow">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>usage: sos run summary_statistics_finemapping.ipynb
+               [workflow_name | -t targets] [options] [workflow_options]
+  workflow_name:        Single or combined workflows defined in this script
+  targets:              One or more targets to generate
+  options:              Single-hyphen sos parameters (see &#34;sos run -h&#34; for details)
+  workflow_options:     Double-hyphen workflow-specific parameters
+
+Workflows:
+  susie_bhat
+  susie_z
+  dap
+
+Global Workflow Options:
+  --cwd . (as path)
+                        Current work directory, where output will be written to
+  --loci . (as path)
+                        Loci file
+  --ss-data-prefix . (as path)
+                        summary statistics file prefix
+  --anno uniform
+                        annotation
+  --prior-file /tmp/file (as path)
+                        FIXME: need to make it work for with anno
+  --n 79845 (as int)
+  --var-y 1 (as int)
+
+Sections
+  susie_bhat_1:         Run SuSiE bhat version
+    Workflow Options:
+      --susie-prior-effect 0.1 (as float)
+                        Set prior effect to 0.0 to estimate from data
+      --[no-]susie-est-residual (default to True)
+                        Whether or not to estimate residual variance
+      --L 5 (as int)
+                        Set maximum number of effect variables
+      --[no-]track-fit (default to False)
+                        Whether or not to keep fit from each iteration, for
+                        debug purpose.
+  susie_z_1:            Run SuSiE Z score version
+    Workflow Options:
+      --L 5 (as int)
+                        Set maximum number of effect variables
+      --[no-]track-fit (default to False)
+                        Whether or not to keep fit from each iteration, for
+                        debug purpose.
+  dap_1:                Run DAP-G
+    Workflow Options:
+      --args &#39;&#39;
+                        Extra arguments to pass to DAP
+  susie_bhat_2, susie_z_2, dap_2: Summarize Fine-mapping results
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="c1"># Current work directory, where output will be written to</span>
+<span class="kn">parameter:</span> <span class="n">cwd</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+<span class="c1"># Loci file</span>
+<span class="kn">parameter:</span> <span class="n">loci</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="c1"># summary statistics file prefix</span>
+<span class="kn">parameter:</span> <span class="n">ss_data_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="c1"># annotation</span>
+<span class="kn">parameter:</span> <span class="n">anno</span> <span class="o">=</span> <span class="s2">&quot;uniform&quot;</span>
+<span class="c1"># FIXME: need to make it work for with anno</span>
+<span class="kn">parameter:</span> <span class="n">prior_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;/tmp/file&#39;</span><span class="p">)</span>
+<span class="kn">parameter:</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">79845</span> <span class="c1"># sample size in GWAS data</span>
+<span class="kn">parameter:</span> <span class="n">var_y</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="n">fail_if</span><span class="p">(</span><span class="ow">not</span> <span class="n">loci</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specify valid path for --loci&#39;</span><span class="p">)</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{loci:a}&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)]</span>
+
+<span class="k">def</span> <span class="nf">fmtP</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">prior_file</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+    <span class="n">anno</span> <span class="o">=</span> <span class="s2">&quot;uniform&quot;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="SuSiE-$\hat{b}$-version">SuSiE $\hat{b}$ version<a class="anchor-link" href="#SuSiE-$\hat{b}$-version">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run SuSiE bhat version</span>
+<span class="p">[</span><span class="n">susie_bhat_1</span><span class="p">]</span>
+<span class="c1"># Set prior effect to 0.0 to estimate from data</span>
+<span class="kn">parameter:</span> <span class="n">susie_prior_effect</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="c1"># Whether or not to estimate residual variance</span>
+<span class="kn">parameter:</span> <span class="n">susie_est_residual</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c1"># Set maximum number of effect variables</span>
+<span class="kn">parameter:</span> <span class="n">L</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># Whether or not to keep fit from each iteration,</span>
+<span class="c1"># for debug purpose.</span>
+<span class="kn">parameter:</span> <span class="n">track_fit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#</span>
+<span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_B.L_{L}.prior_{fmtP(susie_prior_effect)}.res_var_{str(susie_est_residual).lower()}&#39;</span>
+<span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table({prior_file:r})[,2]&#39;</span> <span class="k">if</span> <span class="n">prior_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
+<span class="c1">#</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}.{x[3] if len(x) == 4 else &quot;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&quot; % (x[0], x[1], x[2])}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.{anno}.{suffix}.rds&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">head</span> <span class="o">=</span> <span class="n">T</span><span class="p">)</span>
+    <span class="n">prior</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">prior_str</span><span class="p">}</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="k">as</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;${_input:nn}.LD.txt&quot;</span><span class="p">))</span>
+    <span class="n">bhat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">shat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">susieR</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">susie_bhat</span><span class="p">(</span><span class="n">bhat</span><span class="p">,</span> <span class="n">shat</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">},</span> <span class="n">var_y</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">var_y</span><span class="p">},</span> <span class="n">r_tol</span> <span class="o">=</span> <span class="mf">5e-3</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">L</span><span class="p">},</span> <span class="n">min_abs_corr</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+                  <span class="err">$</span><span class="p">{</span><span class="s1">&#39;estimate_prior_variance=TRUE&#39;</span> <span class="k">if</span> <span class="n">susie_prior_effect</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;scaled_prior_variance=&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">susie_prior_effect</span><span class="p">)},</span>
+                  <span class="err">$</span><span class="p">{</span><span class="s1">&#39;estimate_residual_variance=TRUE&#39;</span> <span class="k">if</span> <span class="n">susie_est_residual</span> <span class="k">else</span> <span class="s1">&#39;estimate_residual_variance=FALSE&#39;</span><span class="p">},</span>
+                  <span class="n">prior_weights</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">track_fit</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="s2">&quot;T&quot;</span> <span class="k">if</span> <span class="n">track_fit</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span><span class="p">})</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">prior</span> <span class="o">=</span> <span class="n">prior</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">z</span> <span class="o">=</span> <span class="n">bhat</span> <span class="o">/</span> <span class="n">shat</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">susie_prior_effect</span><span class="p">}</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">&amp;&amp;</span> <span class="err">$</span><span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">susie_est_residual</span><span class="p">)})</span> <span class="k">print</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="n">c</span><span class="p">(</span><span class="s2">&quot;Estimated PVE:&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">V</span><span class="o">/</span><span class="n">s</span><span class="err">$</span><span class="n">sigma2</span><span class="p">,</span> <span class="mi">4</span><span class="p">)),</span> <span class="n">collapse</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="s2">&quot;T&quot;</span> <span class="k">if</span> <span class="n">track_fit</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span><span class="p">})</span> <span class="n">susie_plot_iteration</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">L</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">nr</span><span class="p">})</span>
+    <span class="n">saveRDS</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="SuSiE-$z$-version">SuSiE $z$ version<a class="anchor-link" href="#SuSiE-$z$-version">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run SuSiE Z score version</span>
+<span class="p">[</span><span class="n">susie_z_1</span><span class="p">]</span>
+<span class="c1"># Set maximum number of effect variables</span>
+<span class="kn">parameter:</span> <span class="n">L</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="c1"># Whether or not to keep fit from each iteration,</span>
+<span class="c1"># for debug purpose.</span>
+<span class="kn">parameter:</span> <span class="n">track_fit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#</span>
+<span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_Z.L_{L}&#39;</span>
+<span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table({prior_file:r})[,2]&#39;</span> <span class="k">if</span> <span class="n">prior_file</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
+<span class="c1">#</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}.{x[3] if len(x) == 4 else &quot;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&quot; % (x[0], x[1], x[2])}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.{anno}.{suffix}.rds&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">head</span> <span class="o">=</span> <span class="n">T</span><span class="p">)</span>
+    <span class="n">prior</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">prior_str</span><span class="p">}</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="k">as</span><span class="o">.</span><span class="n">matrix</span><span class="p">(</span><span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="s2">&quot;${_input:nn}.LD.txt&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">bhat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span>
+      <span class="n">shat</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span>
+      <span class="n">p_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pt</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">bhat</span> <span class="o">/</span> <span class="n">shat</span><span class="p">),</span> <span class="n">df</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+      <span class="n">z_scores</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">qnorm</span><span class="p">(</span><span class="n">p_values</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sign</span><span class="p">(</span><span class="n">bhat</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">z_scores</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="p">}</span>
+        
+    <span class="n">library</span><span class="p">(</span><span class="n">susieR</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">susie_z</span><span class="p">(</span><span class="n">z_scores</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">r_tol</span> <span class="o">=</span> <span class="mf">5e-3</span><span class="p">,</span> <span class="n">L</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">L</span><span class="p">},</span> <span class="n">min_abs_corr</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+                  <span class="n">prior_weights</span><span class="o">=</span><span class="n">prior</span><span class="p">,</span> <span class="n">track_fit</span><span class="o">=</span><span class="err">$</span><span class="p">{</span><span class="s2">&quot;T&quot;</span> <span class="k">if</span> <span class="n">track_fit</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span><span class="p">})</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">prior</span> <span class="o">=</span> <span class="n">prior</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_scores</span>
+    <span class="n">s</span><span class="err">$</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="s2">&quot;T&quot;</span> <span class="k">if</span> <span class="n">track_fit</span> <span class="k">else</span> <span class="s2">&quot;F&quot;</span><span class="p">})</span> <span class="n">susie_plot_iteration</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">L</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">nr</span><span class="p">})</span>
+    <span class="n">saveRDS</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run DAP-G</span>
+<span class="p">[</span><span class="n">dap_1</span><span class="p">]</span>
+<span class="c1"># Extra arguments to pass to DAP</span>
+<span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{out_prefix}.DAP{&quot;.&quot;+fmtp(args) if len(args) else &quot;&quot;}&#39;</span>
+<span class="kn">input:</span> <span class="n">data_file</span><span class="p">,</span> <span class="n">ld_file</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{prefix}.{anno}.pkl&#39;</span>
+<span class="kn">python:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+    <span class="kn">import</span> <span class="nn">os</span>
+    <span class="kn">import</span> <span class="nn">pickle</span>
+
+    <span class="k">def</span> <span class="nf">run_dap_ss</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="n">data_file</span><span class="p">,</span> <span class="n">ld_file</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">varY</span><span class="p">,</span> <span class="n">prior_file</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dap-g&#39;</span><span class="p">,</span> <span class="s1">&#39;-d_est&#39;</span><span class="p">,</span> <span class="n">data_file</span><span class="p">,</span> <span class="s1">&#39;-d_ld&#39;</span><span class="p">,</span> <span class="n">ld_file</span><span class="p">,</span> <span class="s1">&#39;-d_n&#39;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;-d_syy&#39;</span><span class="p">,</span> <span class="n">varY</span><span class="p">,</span> <span class="s1">&#39;-o&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">,</span> <span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{prefix}.stderr&#39;</span><span class="p">,</span> <span class="s1">&#39;--all&#39;</span><span class="p">,</span> <span class="n">args</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">prior_file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">prior_file</span><span class="p">):</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-p&#39;</span><span class="p">,</span> <span class="n">prior_file</span><span class="p">])</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">cmd</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">cmd</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">extract_dap_output</span><span class="p">(</span><span class="n">prefix</span><span class="p">):</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{prefix}.result&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()]</span>
+        <span class="n">pips</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">still_pip</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;cluster_pip&#39;</span><span class="p">:</span>
+                <span class="n">still_pip</span> <span class="o">=</span> <span class="bp">False</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">still_pip</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;((&#39;</span><span class="p">)):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">still_pip</span><span class="p">:</span>
+                <span class="n">pips</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">4</span><span class="p">])])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clusters</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">3</span><span class="p">])])</span>
+        <span class="n">pips</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">pips</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;snp&#39;</span><span class="p">,</span> <span class="s1">&#39;snp_prob&#39;</span><span class="p">,</span> <span class="s1">&#39;snp_log10bf&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster&#39;</span><span class="p">])</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cluster&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster_prob&#39;</span><span class="p">,</span> <span class="s1">&#39;cluster_avg_r2&#39;</span><span class="p">])</span>
+        <span class="n">clusters</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">clusters</span><span class="p">,</span> <span class="n">pips</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;cluster&#39;</span><span class="p">])[</span><span class="s1">&#39;snp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(),</span> <span class="n">on</span> <span class="o">=</span> <span class="s1">&#39;cluster&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;snp&#39;</span><span class="p">:</span> <span class="n">pips</span><span class="p">,</span> <span class="s1">&#39;set&#39;</span><span class="p">:</span> <span class="n">clusters</span><span class="p">}</span>
+
+    <span class="n">run_dap_ss</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">anr</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">ld_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">var_y</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">prior_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="err">$</span><span class="p">{</span><span class="n">args</span><span class="p">})</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">extract_dap_output</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">anr</span><span class="p">})</span>
+    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;var_names&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">str</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">ss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">data_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;z&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ss</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">ss</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;prior&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">prior_file</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">dtype</span> <span class="o">=</span> <span class="nb">float</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="nb">open</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="s1">&#39;wb&#39;</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Plot">Plot<a class="anchor-link" href="#Plot">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Summarize Fine-mapping results</span>
+<span class="p">[</span><span class="n">susie_bhat_2</span><span class="p">,</span> <span class="n">susie_z_2</span><span class="p">,</span> <span class="n">dap_2</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.pdf&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">read_dsc</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
+    <span class="c1"># print something to log</span>
+    <span class="n">write</span><span class="p">(</span><span class="n">format</span><span class="p">(</span><span class="n">Sys</span><span class="o">.</span><span class="n">time</span><span class="p">(),</span> <span class="s2">&quot;%a %b </span><span class="si">%d</span><span class="s2"> </span><span class="si">%X</span><span class="s2"> %Y&quot;</span><span class="p">),</span> <span class="n">stderr</span><span class="p">())</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">susieR</span><span class="p">)</span>
+    <span class="n">is_susie</span> <span class="o">=</span> <span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">null</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">elbo</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">is_susie</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="s1">&#39;SuSiE objective:&#39;</span><span class="p">,</span> <span class="n">susie_get_objective</span><span class="p">(</span><span class="n">s</span><span class="p">),</span> <span class="s2">&quot;at L =&quot;</span><span class="p">,</span> <span class="n">nrow</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">alpha</span><span class="p">)),</span> <span class="n">stderr</span><span class="p">())</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">snp</span> <span class="o">=</span> <span class="n">s</span><span class="err">$</span><span class="n">snp</span>
+        <span class="n">snp</span> <span class="o">=</span> <span class="n">snp</span><span class="p">[</span><span class="n">match</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">var_names</span><span class="p">,</span> <span class="n">snp</span><span class="err">$</span><span class="n">snp</span><span class="p">),]</span>
+        <span class="n">s</span><span class="err">$</span><span class="n">pip</span> <span class="o">=</span> <span class="n">snp</span><span class="err">$</span><span class="n">snp_prob</span>
+        <span class="n">class</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">=</span> <span class="s1">&#39;susie&#39;</span>
+    <span class="p">}</span>
+    <span class="c1"># make some plots</span>
+    <span class="n">pdf</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">},</span> <span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="n">pointsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">par</span><span class="p">(</span><span class="n">mar</span><span class="o">=</span><span class="n">c</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">omi</span><span class="o">=</span><span class="n">c</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span> <span class="n">oma</span><span class="o">=</span><span class="n">c</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">mfrow</span><span class="o">=</span><span class="n">c</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">susie_plot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;PIP&#39;</span><span class="p">)</span>
+    <span class="n">susie_plot</span><span class="p">(</span><span class="n">s</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;z&#39;</span><span class="p">)</span>
+    <span class="n">dev</span><span class="o">.</span><span class="n">off</span><span class="p">()</span>
+    <span class="n">ordering</span> <span class="o">=</span> <span class="n">order</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">pip</span><span class="p">,</span> <span class="n">decreasing</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="ow">is</span><span class="o">.</span><span class="n">null</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">prior</span><span class="p">))</span> <span class="n">s</span><span class="err">$</span><span class="n">prior</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">length</span><span class="p">(</span><span class="n">ordering</span><span class="p">),</span><span class="n">length</span><span class="p">(</span><span class="n">ordering</span><span class="p">))</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot; pip-ranked SNP &quot;</span><span class="p">,</span> <span class="n">s</span><span class="err">$</span><span class="n">var_names</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="s2">&quot; has z-score &quot;</span><span class="p">,</span> 
+              <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">z</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot; pip &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">pip</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">4</span><span class="p">),</span> <span class="s2">&quot; and prior &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">prior</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">4</span><span class="p">)),</span> <span class="n">stderr</span><span class="p">())</span>
+    <span class="p">}</span>
+    <span class="n">ordering</span> <span class="o">=</span> <span class="n">order</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">z</span><span class="p">),</span> <span class="n">decreasing</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">write</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;#&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot; z-ranked SNP &quot;</span><span class="p">,</span> <span class="n">s</span><span class="err">$</span><span class="n">var_names</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span> <span class="s2">&quot; has z-score &quot;</span><span class="p">,</span> 
+              <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">z</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">2</span><span class="p">),</span> <span class="s2">&quot; pip &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">pip</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">4</span><span class="p">),</span> <span class="s2">&quot; and prior &quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">s</span><span class="err">$</span><span class="n">prior</span><span class="p">[</span><span class="n">ordering</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span><span class="mi">4</span><span class="p">)),</span> <span class="n">stderr</span><span class="p">())</span>
+    <span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SuSiE-$B$">SuSiE $B$<a class="anchor-link" href="#SuSiE-$B$">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">susie_bhat</span> \
+        <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="mi">1</span><span class="n">KG_EUR</span><span class="o">/</span><span class="n">chunks</span><span class="o">.</span><span class="n">list</span> \
+        <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">summary_stats</span><span class="o">/</span><span class="n">Summary_statistics</span> \
+        <span class="o">--</span><span class="n">susie</span><span class="o">-</span><span class="n">prior</span><span class="o">-</span><span class="n">effect</span> <span class="mi">0</span> <span class="o">--</span><span class="n">anno</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span> <span class="o">--</span><span class="n">L</span> <span class="mi">5</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">summary_stats</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">.</span><span class="n">chr9_1785000_1790000</span><span class="o">.</span><span class="n">summary_stats</span><span class="o">.</span><span class="n">uniform</span><span class="o">.</span><span class="n">SuSiE_B</span><span class="o">.</span><span class="n">L_5</span><span class="o">.</span><span class="n">prior_0p0</span><span class="o">.</span><span class="n">res_var_true</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">s</span> <span class="n">png</span> <span class="o">--</span><span class="n">dpi</span> <span class="mi">50</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">%preview /home/gaow/tmp/19-Dec-2018/SCZ/summary_stats/Summary_statistics.chr9_1785000_1790000.summary_stats.uniform.SuSiE_B.L_5.prior_0p0.res_var_true.pdf</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">> /home/gaow/tmp/19-Dec-2018/SCZ/summary_stats/Summary_statistics.chr9_1785000_1790000.summary_stats.uniform.SuSiE_B.L_5.prior_0p0.res_var_true.pdf (4.8 KiB):</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="SuSiE-$Z$">SuSiE $Z$<a class="anchor-link" href="#SuSiE-$Z$">&#182;</a></h2>
+</div>
+</div>
+</div>
+<hr>
+Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/53d575be72828eff1c1ff75a4f3b0540d4670c16/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Thu Dec 20 14:27:22 2018 <a href="http://github.com/gaow/fine-mapping/commit/53d575be72828eff1c1ff75a4f3b0540d4670c16">revision 1, 53d575b</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+</div>
+</div>
+</body>
+</html>

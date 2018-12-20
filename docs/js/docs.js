@@ -1,0 +1,3 @@
+var workflowArray = ['summary_statistics_finemapping', 'summary_statistics_wrangler']
+var workflowDict = {'Fine-mapping-workflow-using-summary-statistics-1': 'summary_statistics_finemapping', 'Summary-statistics-data-mungling-in-preparation-for-fine-mapping-pipelines-1': 'summary_statistics_wrangler'}
+var workflowArrayMap = {'summary_statistics_finemapping': 'Fine-mapping workflow u ... y statistics', 'summary_statistics_wrangler': 'Summary statistics data ... ng pipelines'}

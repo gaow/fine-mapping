@@ -703,13 +703,21 @@ Sections
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Make-diagnostic-plot">Make diagnostic plot<a class="anchor-link" href="#Make-diagnostic-plot">&#182;</a></h3>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[5]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Summarize Fine-mapping results</span>
-<span class="p">[</span><span class="n">susie_bhat_2</span><span class="p">,</span> <span class="n">susie_z_2</span><span class="p">,</span> <span class="n">dap_2</span><span class="p">,</span> <span class="n">caviar_2</span><span class="p">]</span>
+<span class="p">[</span><span class="n">susie_bhat_2</span><span class="p">,</span> <span class="n">susie_z_2</span><span class="p">,</span> <span class="n">dap_2</span><span class="p">,</span> <span class="n">caviar_2</span> <span class="p">(</span><span class="n">plot</span> <span class="n">PIP</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.pdf&#39;</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
@@ -1417,7 +1425,7 @@ INFO: Workflow susie_z (ID=e82685cba2fb240a) is ignored with 2 ignored steps.
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/a4f65a6e09c865c4377d57dd984766c050f1d03f/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Dec 21 13:46:31 2018 <a href="http://github.com/gaow/fine-mapping/commit/a4f65a6e09c865c4377d57dd984766c050f1d03f">revision 2, a4f65a6</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/148a85778b61b67240cd4d677c293e64eb4ef91f/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Dec 21 14:39:06 2018 <a href="http://github.com/gaow/fine-mapping/commit/148a85778b61b67240cd4d677c293e64eb4ef91f">revision 3, 148a857</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

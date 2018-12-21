@@ -708,8 +708,8 @@ Sections
 <span class="kn">parameter:</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Input column ID has to be of length 5 or 6.&#39;</span><span class="p">)</span>
 <span class="kn">input:</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">concurrent</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="kn">output:</span> <span class="n">summary_stats</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}.summary_stats.txt&quot;</span><span class="p">,</span> <span class="n">ld_matrix</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}.LD.txt&quot;</span>
-<span class="kn">python3:</span> <span class="n">expand</span><span class="o">=</span><span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.allele_flip.log&#39;</span>
+<span class="kn">output:</span> <span class="n">summary_stats</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}/{_input:bn}.summary_stats.txt&quot;</span><span class="p">,</span> <span class="n">ld_matrix</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}/{_input:bn}.LD.txt&quot;</span>
+<span class="kn">python3:</span> <span class="n">expand</span><span class="o">=</span><span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output[0]:n}.allele_flip.log&#39;</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">sys</span>
 
@@ -968,7 +968,7 @@ Sections
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">allele_flip</span><span class="o">.</span><span class="n">log</span> <span class="o">-</span><span class="n">n</span> <span class="o">--</span><span class="n">limit</span> <span class="mi">20</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">allele_flip</span><span class="o">.</span><span class="n">log</span> <span class="o">-</span><span class="n">n</span> <span class="o">--</span><span class="n">limit</span> <span class="mi">20</span>
 </pre></div>
 
 </div>
@@ -1054,7 +1054,7 @@ total A/T and C/G removed:0</pre>
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">summary_stats</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">summary_stats</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
 </pre></div>
 
 </div>
@@ -1137,7 +1137,7 @@ total A/T and C/G removed:0</pre>
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">Annotation_atac</span><span class="o">-</span><span class="n">seq</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">Annotation_atac</span><span class="o">-</span><span class="n">seq</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">n</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
 </pre></div>
 
 </div>
@@ -1221,7 +1221,7 @@ total A/T and C/G removed:0</pre>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
-<span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="s1">&#39;/home/gaow/tmp/19-Dec-2018/SCZ/Summary_statistics/chr9_84630941_84813641.LD.txt&#39;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">nrows</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="s1">&#39;/home/gaow/tmp/19-Dec-2018/SCZ/Summary_statistics/chr9_84630941_84813641/chr9_84630941_84813641.LD.txt&#39;</span><span class="p">,</span> <span class="n">sep</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">nrows</span> <span class="o">=</span> <span class="mi">5</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -1415,7 +1415,7 @@ total A/T and C/G removed:0</pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/148a85778b61b67240cd4d677c293e64eb4ef91f/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by Gao Wang on Fri Dec 21 14:39:06 2018 <a href="http://github.com/gaow/fine-mapping/commit/148a85778b61b67240cd4d677c293e64eb4ef91f">revision 4, 148a857</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by Gao Wang on Fri Dec 21 16:01:09 2018 <a href="http://github.com/gaow/fine-mapping/commit/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb">revision 5, fcb7b8f</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

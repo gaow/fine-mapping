@@ -246,7 +246,7 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>This pipeline was devised by Gao Wang and implemented by Min Qiao at The University of Chicago.</p>
+<p>This pipeline was devised by Gao Wang and implemented by Min Qiao at The University of Chicago. It can be downloaded <a href="https://github.com/gaow/fine-mapping/tree/master/workflow">from here</a>.</p>
 
 </div>
 </div>
@@ -307,8 +307,20 @@ A popular choice is <a href="http://hgdownload.cse.ucsc.edu/gbdb/hg19/1000Genome
 2 ALL.chr2.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.EUR.vcf.gz
 ...</code></pre>
 <p>where each line is white-space separated with the first the chromosome number and second the file name.</p>
+<p><strong>For UChicago midway users</strong>: reference genotype data for 1000 Genomes EUR samples are extracted using workflow <code>prepare_1KG_reference</code> below. The output can be found under <code>/project/mstephens/SuSIE_gtex_CPP/1KG_EUR</code>. The manifest file <code>1KG_EUR.manifest</code> was prepared by:</p>
+
+<pre><code>for i in {1..22} X; do echo $i ALL.chr$i.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.EUR.vcf.gz; done &gt; 1KG_EUR.manifest</code></pre>
 </li>
 </ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The end of this workflow notebook has some example commands running on some toy data. These toy data (500MB; did not bother to make it smaller due to my laziness) <a href="http://shiny.stephenslab.uchicago.edu/gaow/finemapping_summary_stats_example.tar.gz">can be downloaded from here</a> if you want to reproduce these commands.</p>
 
 </div>
 </div>
@@ -501,7 +513,7 @@ Sections
                         statistics file does not have a header
   default_3:
     Workflow Options:
-      --annotation . (as path)
+      --annotation &#39;name:/path/to/annotation/file&#39;
 </pre>
 </div>
 </div>
@@ -601,8 +613,10 @@ Sections
     <span class="n">meta</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">manifest</span><span class="p">]</span>
     <span class="n">genotypes</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">manifest</span><span class="p">]</span>
 
-<span class="kn">input:</span> <span class="n">sos_groups</span><span class="p">(</span><span class="n">genotypes</span><span class="p">,</span> <span class="n">by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">set_each</span><span class="p">(</span><span class="s2">&quot;chrom&quot;</span><span class="p">,</span> <span class="n">chroms</span><span class="p">),</span> <span class="kp">concurrent</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="kn">input:</span> <span class="n">genotypes</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">paired_with</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">chrom</span><span class="o">=</span><span class="n">chroms</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{_input:nn}.{race}.vcf.gz&quot;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;5m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;2G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">grep</span> <span class="o">-</span><span class="n">w</span> <span class="s2">&quot;{race}&quot;</span> <span class="p">{</span><span class="n">panel_meta</span><span class="p">}</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">f</span> <span class="mi">1</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">nn</span><span class="p">}</span><span class="n">_extracted</span><span class="o">.</span><span class="n">txt</span>
     <span class="n">bcftools</span> <span class="n">view</span> <span class="o">-</span><span class="n">S</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">nn</span><span class="p">}</span><span class="n">_extracted</span><span class="o">.</span><span class="n">txt</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">-</span><span class="n">Oz</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -612,7 +626,7 @@ Sections
 <span class="k">if</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">(</span><span class="n">reference</span><span class="p">)</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;vcf.gz&#39;</span><span class="p">):</span>
     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{reference:n}.{race}.{reference:x}&quot;</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">_output</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{item.get(&quot;chrom&quot;)} {item}&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{item.chrom} {item}&#39;</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -650,8 +664,10 @@ Sections
     <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">genotype</span><span class="p">:</span>
         <span class="n">genotype</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{reference:ad}&#39;</span><span class="p">,</span> <span class="n">genotype</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
 
-<span class="kn">input:</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">for_each</span> <span class="o">=</span> <span class="s1">&#39;chunks&#39;</span><span class="p">,</span> <span class="kp">concurrent</span> <span class="o">=</span> <span class="bp">True</span>
-<span class="kn">output:</span> <span class="n">sos_targets</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{ss_data:n}/{_chunks[-1] if len(_chunks) &gt; 3 else &#39;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&#39; % (_chunks[0], _chunks[1], _chunks[2])}.pkl&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;chunks&quot;</span><span class="p">,</span> <span class="n">chunks</span><span class="p">)</span>
+<span class="kn">input:</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">for_each</span> <span class="o">=</span> <span class="s1">&#39;chunks&#39;</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data:n}/{_chunks[-1] if len(_chunks) &gt; 3 else &#39;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&#39; % (_chunks[0], _chunks[1], _chunks[2])}.pkl&quot;</span><span class="p">,</span> <span class="n">group_with</span> <span class="o">=</span> <span class="s1">&#39;chunks&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;5m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">python3:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span>
     <span class="kn">from</span> <span class="nn">cyvcf2</span> <span class="kn">import</span> <span class="n">VCF</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -707,8 +723,9 @@ Sections
 <span class="c1"># use --no-header to indicate that input summary statistics file does not have a header</span>
 <span class="kn">parameter:</span> <span class="n">header</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Input column ID has to be of length 5 or 6.&#39;</span><span class="p">)</span>
-<span class="kn">input:</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">concurrent</span> <span class="o">=</span> <span class="bp">True</span>
 <span class="kn">output:</span> <span class="n">summary_stats</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}/{_input:bn}.summary_stats.txt&quot;</span><span class="p">,</span> <span class="n">ld_matrix</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:n}/{_input:bn}.LD.txt&quot;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">python3:</span> <span class="n">expand</span><span class="o">=</span><span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output[0]:n}.allele_flip.log&#39;</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span><span class="o">,</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
     <span class="kn">import</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">sys</span>
@@ -720,7 +737,7 @@ Sections
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="k">print</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">locus</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">step_input</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;chunks&quot;</span><span class="p">)[</span><span class="n">_index</span><span class="p">]}</span>
+    <span class="n">locus</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="o">.</span><span class="n">_chunks</span><span class="p">}</span>
     <span class="n">col_to_use</span> <span class="o">=</span> <span class="err">$</span><span class="p">{[</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]}</span>
     <span class="n">loci_col</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">loci_column</span><span class="p">}</span>
     <span class="k">if</span> <span class="n">loci_col</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -769,7 +786,7 @@ Sections
             <span class="k">return</span> <span class="s2">&quot;C&quot;</span>
         <span class="k">elif</span> <span class="n">inp</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;G&quot;</span>
-    <span class="c1"># S3 </span>
+    <span class="c1"># S3</span>
     <span class="n">FLIPD</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># adjusted</span>
     <span class="n">ADJ</span> <span class="o">=</span> <span class="mi">0</span>
@@ -872,8 +889,10 @@ Sections
 <span class="n">anno</span><span class="p">,</span> <span class="n">prior_file</span> <span class="o">=</span> <span class="n">annotation</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
 <span class="n">prior_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">prior_file</span><span class="p">)</span>
 <span class="n">stop_if</span><span class="p">(</span><span class="ow">not</span> <span class="n">prior_file</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Quit because annotation file is not found&#39;</span><span class="p">)</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_from</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="kp">concurrent</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_from</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">2</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{_input[0]:nn}.{anno}.txt&quot;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;2G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">python3:</span> <span class="n">expand</span><span class="o">=</span><span class="s2">&quot;${ }&quot;</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
     <span class="n">A1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_table</span><span class="p">(</span><span class="s2">&quot;${prior_file}&quot;</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
@@ -913,7 +932,8 @@ Sections
 <div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">summary_statistics_wrangler</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">--</span><span class="n">reference</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="mi">1</span><span class="n">KG_EUR</span><span class="o">/</span><span class="n">test</span><span class="o">.</span><span class="n">manifest</span> \
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">one_loci</span><span class="o">.</span><span class="n">txt</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">gtex_metasoft_summary_stats</span><span class="o">.</span><span class="n">gz</span> \
-        <span class="o">--</span><span class="n">columns</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">6</span> <span class="mi">7</span> <span class="o">--</span><span class="n">loci</span><span class="o">-</span><span class="n">column</span> <span class="mi">5</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">header</span>
+        <span class="o">--</span><span class="n">columns</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">6</span> <span class="mi">7</span> <span class="o">--</span><span class="n">loci</span><span class="o">-</span><span class="n">column</span> <span class="mi">5</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">header</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -939,13 +959,25 @@ Sections
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">chunks</span><span class="o">.</span><span class="n">list</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">.</span><span class="n">gz</span> \
         <span class="o">--</span><span class="n">columns</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="mi">4</span> <span class="mi">6</span> <span class="mi">7</span> <span class="o">--</span><span class="n">adjust</span><span class="o">-</span><span class="n">panel</span><span class="o">-</span><span class="n">position</span> <span class="mi">1</span> \
-        <span class="o">--</span><span class="n">annotation</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span><span class="p">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">annotations</span><span class="o">/</span><span class="n">Annotation_atac</span><span class="o">-</span><span class="n">seq</span><span class="o">.</span><span class="n">gz</span>
+        <span class="o">--</span><span class="n">annotation</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span><span class="p">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Annotation_atac</span><span class="o">-</span><span class="n">seq</span><span class="o">.</span><span class="n">gz</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>For UChicago midway users</strong>: to run these pipelines on RCC cluster, please take a look at <code>midway2.yml</code> file (found in this repository), modify it as you see fit, and replace <code>-q none -j 8</code> with:</p>
+
+<pre><code>-c midway2.yml -q midway2 -J 40</code></pre>
+
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
@@ -1415,7 +1447,7 @@ total A/T and C/G removed:0</pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by Gao Wang on Fri Dec 21 16:01:09 2018 <a href="http://github.com/gaow/fine-mapping/commit/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb">revision 5, fcb7b8f</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/f860397f8f3cc22631c87258beaceb35d2298e8e/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by Gao Wang on Thu Dec 27 23:14:25 2018 <a href="http://github.com/gaow/fine-mapping/commit/f860397f8f3cc22631c87258beaceb35d2298e8e">revision 10, f860397</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

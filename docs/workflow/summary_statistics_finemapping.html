@@ -237,9 +237,18 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Fine-mapping-workflow-using-summary-statistics">Fine-mapping workflow using summary statistics<a class="anchor-link" href="#Fine-mapping-workflow-using-summary-statistics">&#182;</a></h1><p>Here I implement a workflow that does summary statistics fine-mapping using SuSiE, DAP-G and CAVIAR.</p>
-<p>SuSiE is implemented in <a href="https://github.com/stephenslab/susieR"><code>susieR</code></a> (please use version 0.6.1+).</p>
-<p><code>susieR</code> is flexible in input format (data matrices). Since we need to analyze the data with command executables such as DAP-G and CAVIAR we make input format compatible with these tools.</p>
+<h1 id="Fine-mapping-workflow-using-summary-statistics">Fine-mapping workflow using summary statistics<a class="anchor-link" href="#Fine-mapping-workflow-using-summary-statistics">&#182;</a></h1><p>This is a workflow that does summary statistics fine-mapping using SuSiE, DAP-G and CAVIAR.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>This pipeline was devised by Gao Wang and implemented by Gao Wang and Yuxin Zou at The University of Chicago with input from Kushal Dey at Harvard University. It can be downloaded <a href="https://github.com/gaow/fine-mapping/tree/master/workflow">from here</a>. 
+SuSiE is implemented in <a href="https://github.com/stephenslab/susieR"><code>susieR</code></a> (please use version 0.6.2+).</p>
+<p><code>susieR</code> is flexible in input format (R data matrices). Since we need to analyze the data with command executables such as DAP-G and CAVIAR we make input format compatible with these tools.</p>
 
 </div>
 </div>
@@ -259,6 +268,17 @@ devtools::install_github("stephenslab/dsc", subdir = "dscrutils", force = TRUE)<
 
 <pre><code>sudo apt-get install libgsl-dev</code></pre>
 <p>and make sure DAP-G and CAVIAR exists under <code>$PATH</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Input-data">Input data<a class="anchor-link" href="#Input-data">&#182;</a></h2><p>Input data relies on the output of the pipeline <code>summary_statistics_wrangler.ipynb</code> (an example input data-set for this pipeline can be found in that notebook). The input format is the same for SuSiE, DAP and CAVIAR.</p>
+<h2 id="Output-format">Output format<a class="anchor-link" href="#Output-format">&#182;</a></h2><p>Output is still work in progress.</p>
+<p>Currently they are just R or Python data objects <code>*.rds</code> or <code>*.pkl</code> files and can be loaded via <code>dscrutils::read_dsc</code>. It contains the most comprehensive information and can be used to generate more succinct output files downstream. Additionally there will be a PDF file to visualize PIP and original $z$ scores.</p>
 
 </div>
 </div>
@@ -433,7 +453,7 @@ Sections
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run SuSiE bhat version</span>
 <span class="p">[</span><span class="n">susie_bhat_1</span><span class="p">]</span>
-<span class="n">fail_if</span><span class="p">(</span><span class="n">n</span><span class="o">&lt;=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specif valid sample size --n&#39;</span><span class="p">)</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="n">n</span><span class="o">&lt;=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specify valid sample size --n&#39;</span><span class="p">)</span>
 <span class="c1"># Set pve to 0.0 to estimate from data</span>
 <span class="kn">parameter:</span> <span class="n">susie_pve</span> <span class="o">=</span> <span class="mf">0.1</span>
 <span class="c1"># use --pve-is-total to indicate the pve set above is for the entire loci</span>
@@ -450,9 +470,11 @@ Sections
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_B.L_{L}.prior_{fmtP(susie_pve)}.res_var_{str(susie_est_residual).lower()}&#39;</span>
 <span class="n">var_y_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;var_y = {var_y},&#39;</span> <span class="k">if</span> <span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
 <span class="c1">#</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.rds&#39;</span>
 <span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table(&quot;{_input:nn}.{annotation}.txt&quot;)[,2]&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{_input:nn}.{annotation}.txt&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">head</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
     <span class="n">prior</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">prior_str</span><span class="p">}</span>
@@ -508,9 +530,11 @@ Sections
 <span class="c1">#</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_Z.L_{L}&#39;</span>
 <span class="c1">#</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.rds&#39;</span>
 <span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table(&quot;{_input:nn}.{annotation}.txt&quot;)[,2]&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{_input:nn}.{annotation}.txt&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">},</span> <span class="n">head</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
     <span class="n">prior</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">prior_str</span><span class="p">}</span>
@@ -562,8 +586,10 @@ Sections
 <span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;DAP{&quot;.&quot;+fmtP(args) if len(args) else &quot;&quot;}&#39;</span>
 <span class="c1">#</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.pkl&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">python:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span>
     <span class="kn">import</span> <span class="nn">sys</span>
     <span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
@@ -639,8 +665,10 @@ Sections
 <span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;CAVIAR{&quot;.&quot;+fmtP(args) if len(args) else &quot;&quot;}&#39;</span>
 <span class="c1">#</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="kp">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/{x}/{x}.summary_stats.txt&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{suffix}.rds&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;5G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
     <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
@@ -733,6 +761,8 @@ Sections
 <span class="p">[</span><span class="n">susie_bhat_2</span><span class="p">,</span> <span class="n">susie_z_2</span><span class="p">,</span> <span class="n">dap_2</span><span class="p">,</span> <span class="n">caviar_2</span> <span class="p">(</span><span class="n">plot</span> <span class="n">PIP</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.pdf&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;3m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;2G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">read_dsc</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
     <span class="c1"># print something to log</span>
@@ -783,6 +813,18 @@ Sections
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>Commands below run the pipeline on a local computer.</p>
+<p><strong>For UChicago midway users</strong>: to run these pipelines on RCC cluster, please take a look at <code>midway2.yml</code> file (found in this repository), modify it as you see fit, and replace <code>-q none -j 8</code> with:</p>
+
+<pre><code>-c midway2.yml -q midway2 -J 40</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="SuSiE-$\hat{b}$">SuSiE $\hat{b}$<a class="anchor-link" href="#SuSiE-$\hat{b}$">&#182;</a></h3>
 </div>
 </div>
@@ -806,7 +848,8 @@ Sections
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span> \
         <span class="o">--</span><span class="n">annotation</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span> \
         <span class="o">--</span><span class="n">n</span> <span class="mi">79845</span> \
-        <span class="o">--</span><span class="n">susie</span><span class="o">-</span><span class="n">pve</span> <span class="mf">0.005</span> <span class="o">--</span><span class="n">L</span> <span class="mi">5</span>
+        <span class="o">--</span><span class="n">susie</span><span class="o">-</span><span class="n">pve</span> <span class="mf">0.005</span> <span class="o">--</span><span class="n">L</span> <span class="mi">5</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -984,7 +1027,8 @@ SuSiE objective: -113313.785692437 at L = 5
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">one_loci</span><span class="o">.</span><span class="n">txt</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">gtex_metasoft_summary_stats</span> \
         <span class="o">--</span><span class="n">n</span> <span class="mi">800</span> \
-        <span class="o">--</span><span class="n">susie</span><span class="o">-</span><span class="n">pve</span> <span class="mf">0.1</span> <span class="o">--</span><span class="n">L</span> <span class="mi">5</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">susie</span><span class="o">-</span><span class="n">est</span><span class="o">-</span><span class="n">residual</span>
+        <span class="o">--</span><span class="n">susie</span><span class="o">-</span><span class="n">pve</span> <span class="mf">0.1</span> <span class="o">--</span><span class="n">L</span> <span class="mi">5</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">susie</span><span class="o">-</span><span class="n">est</span><span class="o">-</span><span class="n">residual</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -1100,7 +1144,8 @@ INFO: Workflow susie_bhat (ID=10c68937a3df62e9) is executed successfully with 2 
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">chunks</span><span class="o">.</span><span class="n">list</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span> \
         <span class="o">--</span><span class="n">annotation</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span> \
-        <span class="o">--</span><span class="n">L</span> <span class="mi">5</span>
+        <span class="o">--</span><span class="n">L</span> <span class="mi">5</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -1218,7 +1263,8 @@ INFO: Workflow susie_z (ID=faeee78a5b518cd1) is executed successfully with 2 com
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span> \
         <span class="o">--</span><span class="n">annotation</span> <span class="n">atac</span><span class="o">-</span><span class="n">seq</span> \
         <span class="o">--</span><span class="n">n</span> <span class="mi">79845</span> \
-        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">DAP_EXE_PATH</span>
+        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">DAP_EXE_PATH</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -1334,7 +1380,8 @@ INFO: Workflow dap (ID=c895e1125141fae4) is executed successfully with 2 complet
 <span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">caviar</span> \
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">chunks</span><span class="o">.</span><span class="n">list</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span> \
-        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">CAVIAR_EXE_PATH</span> <span class="o">--</span><span class="n">args</span> <span class="s2">&quot;&#39;-c 2&#39;&quot;</span>
+        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">CAVIAR_EXE_PATH</span> <span class="o">--</span><span class="n">args</span> <span class="s2">&quot;&#39;-c 2&#39;&quot;</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -1442,7 +1489,8 @@ INFO: Workflow caviar (ID=23c609e929d3e8b1) is executed successfully with 2 comp
 <span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">caviar</span> \
         <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">one_loci</span><span class="o">.</span><span class="n">txt</span> \
         <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">gtex_metasoft_summary_stats</span> \
-        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">CAVIAR_EXE_PATH</span> <span class="o">--</span><span class="n">args</span> <span class="s2">&quot;&#39;-c 2&#39;&quot;</span>
+        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">CAVIAR_EXE_PATH</span> <span class="o">--</span><span class="n">args</span> <span class="s2">&quot;&#39;-c 2&#39;&quot;</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
 </pre></div>
 
 </div>
@@ -1534,7 +1582,7 @@ INFO: Workflow caviar (ID=157b4cf09027e3f5) is executed successfully with 2 comp
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Dec 21 16:01:09 2018 <a href="http://github.com/gaow/fine-mapping/commit/fcb7b8fdeaf8ae2cbe6eb95f51458cb2d83f1dbb">revision 4, fcb7b8f</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/f860397f8f3cc22631c87258beaceb35d2298e8e/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Thu Dec 27 23:14:25 2018 <a href="http://github.com/gaow/fine-mapping/commit/f860397f8f3cc22631c87258beaceb35d2298e8e">revision 5, f860397</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

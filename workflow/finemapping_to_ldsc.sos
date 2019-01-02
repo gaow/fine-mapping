@@ -14,13 +14,15 @@ parameter: data = path()
 parameter: chroms = [x+1 for x in range(22)]
 # Prefix for the BIM reference file
 parameter: reference_snp_prefix = path()
+# Output directory
+parameter: output_dir = path("somewhere/over_the_rainbow")
 
 fail_if(not data.is_file(), msg = "Please specify valid data file via --data")
 fail_if(len(glob.glob(f"{reference_snp_prefix:a}.*.bim")) == 0, msg = 'Please specify valid --reference-snp-prefix')
 
 [default]
 input: data, for_each = 'chroms'
-output: f"{_input:n}.chr{_chroms}.annot.gz"
+output: f"{output_dir:a}/{output_dir:b}.{_chroms}.annot.gz"
 task: trunk_workers = 1, trunk_size = 1, walltime = '3m', mem = '2G', cores = 1, tags = f'{step_name}_{_output:bn}'
 R: expand = "${ }"
     library(data.table)

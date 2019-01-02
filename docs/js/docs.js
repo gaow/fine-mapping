@@ -1,3 +1,3 @@
-var workflowArray = ['finemapping_results_wrangler', 'summary_statistics_finemapping', 'summary_statistics_wrangler']
+var workflowArray = ['finemapping_results_wrangler', 'summary_statistics_finemapping', 'summary_statistics_wrangler', 'finemapping_to_ldsc.pipeline']
 var workflowDict = {'Fine-mapping-result-post-processing-1': 'finemapping_results_wrangler', 'Fine-mapping-workflow-using-summary-statistics-1': 'summary_statistics_finemapping', 'Summary-statistics-data-mungling-in-preparation-for-fine-mapping-pipelines-1': 'summary_statistics_wrangler'}
 var workflowArrayMap = {'finemapping_results_wrangler': 'Fine-mapping result post processing', 'summary_statistics_finemapping': 'Fine-mapping workflow u ... y statistics', 'summary_statistics_wrangler': 'Summary statistics data ... ng pipelines'}

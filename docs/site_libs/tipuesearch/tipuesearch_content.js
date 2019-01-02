@@ -1,5 +1,7 @@
 var tipuesearch = {"pages": [
 {"mainTitle": "Workflow", "title": "Workflow", "text": "Workflow ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Workflow"},
+{"mainTitle": "Workflow", "title": "Notebooks", "text": "Notebooks ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Notebooks"},
+{"mainTitle": "Workflow", "title": "Pipelines", "text": "Pipelines ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Pipelines"},
 {"mainTitle": "Welcome to fine-mapping!", "title": "Welcome to fine-mapping!", "text": "Welcome to fine-mapping ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/index.html", "url": "http://gaow.github.io/fine-mapping/index.html#Welcome-to-fine-mapping!"},
 {"mainTitle": "Summary statistics data mungling in preparation for fine-mapping pipelines", "title": "Summary statistics data mungling in preparation for fine-mapping pipelines", "text": "Summary statistics data mungling in preparation for fine-mapping pipelines ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_wrangler.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_wrangler.html#Summary-statistics-data-mungling-in-preparation-for-fine-mapping-pipelines"},
 {"mainTitle": "Summary statistics data mungling in preparation for fine-mapping pipelines", "title": "Input", "text": "Input ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_wrangler.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_wrangler.html#Input"},
@@ -39,5 +41,10 @@ var tipuesearch = {"pages": [
 {"mainTitle": "Fine-mapping workflow using summary statistics", "title": "SuSiE $\hat{b}$", "text": "SuSiE \hat b ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html#SuSiE-$\hat{b}$"},
 {"mainTitle": "Fine-mapping workflow using summary statistics", "title": "SuSiE $z$", "text": "SuSiE z ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html#SuSiE-$z$"},
 {"mainTitle": "Fine-mapping workflow using summary statistics", "title": "DAP", "text": "DAP ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html#DAP"},
-{"mainTitle": "Fine-mapping workflow using summary statistics", "title": "CAVIAR", "text": "CAVIAR ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html#CAVIAR"}
+{"mainTitle": "Fine-mapping workflow using summary statistics", "title": "CAVIAR", "text": "CAVIAR ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html", "url": "http://gaow.github.io/fine-mapping/workflow/summary_statistics_finemapping.html#CAVIAR"},
+{"mainTitle": "finemapping_to_ldsc.sos
+         
+      ", "title": "finemapping_to_ldsc.sos
+         
+      ", "text": "finemapping_to_ldsc.sos ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/finemapping_to_ldsc.pipeline.html", "url": "http://gaow.github.io/fine-mapping/workflow/finemapping_to_ldsc.pipeline.html"}
 ]};

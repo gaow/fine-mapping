@@ -351,6 +351,9 @@ body {
 
 Workflows:
   default
+  consolidate
+  update_variant_id
+  update_coordinate
 
 Global Workflow Options:
   --ss-data-prefix . (as path)
@@ -360,13 +363,14 @@ Global Workflow Options:
                         identifier for fine-mapping results to be extracted
 
 Sections
-  default_1:            Consolidate fine-mapping results
+  default:
+  consolidate:          Consolidate fine-mapping results
     Workflow Options:
       --pip-thresh 0.05 (as float)
                         Keep PIP above these thresholds
       --round-off 6 (as int)
                         Round PIP to given digits
-  default_2:            Update variant ID based on chrom and pos (optional)
+  update_variant_id:    Update variant ID based on chrom and pos (optional)
     Workflow Options:
       --id-map-prefix . (as path)
                         Path containing files for variant ID update rule Each
@@ -377,7 +381,7 @@ Sections
                         genomic position is [2,4] for BIM files
       --chroms 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 (as list)
                         chromosome identifiers
-  default_3:            Update genomic coordinates based on variant ID
+  update_coordinate:    Update genomic coordinates based on variant ID
                         (optional)
     Workflow Options:
       --coordinate-map-prefix . (as path)
@@ -427,6 +431,20 @@ Sections
 </div>
 
 </div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">default</span><span class="p">]</span>
+<span class="n">sos_run</span><span class="p">(</span><span class="s1">&#39;consolidate+update_variant_id+update_coordinate&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div>
 <div class="inner_cell">
@@ -441,7 +459,7 @@ Sections
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate fine-mapping results</span>
-<span class="p">[</span><span class="n">default_1</span> <span class="p">(</span><span class="n">extract</span> <span class="n">results</span> <span class="n">to</span> <span class="n">single</span> <span class="nb">file</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">consolidate</span> <span class="p">(</span><span class="n">extract</span> <span class="n">results</span> <span class="n">to</span> <span class="n">single</span> <span class="nb">file</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="c1"># Keep PIP above these thresholds</span>
 <span class="kn">parameter:</span> <span class="n">pip_thresh</span> <span class="o">=</span> <span class="mf">0.05</span>
@@ -511,7 +529,7 @@ Sections
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update variant ID based on chrom and pos (optional)</span>
-<span class="p">[</span><span class="n">default_2</span> <span class="p">(</span><span class="n">update</span> <span class="n">variant</span> <span class="n">ID</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">update_variant_id</span> <span class="p">(</span><span class="n">update</span> <span class="n">variant</span> <span class="n">ID</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
 <span class="c1"># Path containing files for variant ID update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
@@ -565,7 +583,7 @@ Sections
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update genomic coordinates based on variant ID (optional)</span>
-<span class="p">[</span><span class="n">default_3</span> <span class="p">(</span><span class="n">update</span> <span class="n">genomic</span> <span class="n">coordinates</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<span class="p">[</span><span class="n">update_coordinate</span> <span class="p">(</span><span class="n">update</span> <span class="n">genomic</span> <span class="n">coordinates</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
 <span class="c1"># Path containing files for coordinate update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
@@ -637,7 +655,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/d553fc572c986f19aafcfb7c8240f95763b8a896/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 20:59:21 2019 <a href="http://github.com/gaow/fine-mapping/commit/d553fc572c986f19aafcfb7c8240f95763b8a896">revision 8, d553fc5</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/e7c10d610b8fe2092d0a7167d70f4da7a59c4f0b/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 21:02:42 2019 <a href="http://github.com/gaow/fine-mapping/commit/e7c10d610b8fe2092d0a7167d70f4da7a59c4f0b">revision 9, e7c10d6</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

@@ -258,7 +258,7 @@ body {
 <h2 id="Input-data">Input data<a class="anchor-link" href="#Input-data">&#182;</a></h2><p>Input are results of fine-mapping pipeline <code>summary_statistics_finemapping.ipynb</code> in R's <code>RDS</code> format for SuSiE and CAVIAR, and <code>pkl</code> format for DAP.</p>
 <h2 id="Output-data">Output data<a class="anchor-link" href="#Output-data">&#182;</a></h2><p>columns are:</p>
 
-<pre><code>chr pos ref alt snp_id locus_id PIP CS</code></pre>
+<pre><code>chr pos ref alt variant_id locus_id ...</code></pre>
 
 </div>
 </div>
@@ -267,10 +267,17 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>where <code>snp_id</code> will be rsID if some annotation files on rsID are provided. Otherwise it will take the format of <code>chr:pos:ref:alt</code>.</p>
+<p>where <code>snp_id</code> will be rsID if some annotation files on rsID are provided and the <code>update_variant_id</code> workflow below was executed. Otherwise it will take the default format of <code>chr:pos:ref:alt</code>.</p>
+<p>Because each fine-mapping software can have different output, the columns after the first 6 are arbitary. For SuSiE for example they are</p>
+
+<pre><code>chr pos ref alt variant_id locus_id pip cs cs_size cs_purity</code></pre>
+<p>For CAVIAR they are</p>
+
+<pre><code>chr pos ref alt variant_id locus_id pip cs_size</code></pre>
+<p>Naturally per locus <code>cs</code> related information will be redundant. This is one draw-back to using a flat table output format.</p>
 <h2 id="Additional-data-processing">Additional data processing<a class="anchor-link" href="#Additional-data-processing">&#182;</a></h2><p>Here we also provide additional routines to process the data,</p>
 <ol>
-<li>Swap the <code>snp_id</code> column using external annotations, for example by rsID.</li>
+<li>Update the <code>variant_id</code> column using external annotations, for example by rsID.</li>
 <li>"liftover" to other builds -- we only support it via rsID matching</li>
 </ol>
 <p>Notice that only the first 5 columns are necessary for these additional operations. The columns after the fifth can be arbitary and will be kept during the process.</p>
@@ -458,8 +465,8 @@ Sections
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate fine-mapping results</span>
-<span class="p">[</span><span class="n">consolidate</span> <span class="p">(</span><span class="n">extract</span> <span class="n">results</span> <span class="n">to</span> <span class="n">single</span> <span class="nb">file</span><span class="p">)]</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate fine-mapping results to a single file</span>
+<span class="p">[</span><span class="n">consolidate</span><span class="p">]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="c1"># Keep PIP above these thresholds</span>
 <span class="kn">parameter:</span> <span class="n">pip_thresh</span> <span class="o">=</span> <span class="mf">0.05</span>
@@ -486,6 +493,7 @@ Sections
         <span class="n">out</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">}</span> <span class="o">|</span> <span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">4</span><span class="p">])),</span> <span class="p">]</span>
     <span class="p">}</span>
     <span class="n">is_float</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span><span class="ow">is</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">integer</span><span class="p">(</span><span class="n">x</span><span class="p">)}</span>
+
     <span class="c1"># Data extraction script</span>
     <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">))</span>
     <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">))</span>
@@ -528,8 +536,8 @@ Sections
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update variant ID based on chrom and pos (optional)</span>
-<span class="p">[</span><span class="n">update_variant_id</span> <span class="p">(</span><span class="n">update</span> <span class="n">variant</span> <span class="n">ID</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update variant ID based on chrom and pos, from per chrom files (optional)</span>
+<span class="p">[</span><span class="n">update_variant_id</span><span class="p">]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
 <span class="c1"># Path containing files for variant ID update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
@@ -582,8 +590,8 @@ Sections
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update genomic coordinates based on variant ID (optional)</span>
-<span class="p">[</span><span class="n">update_coordinate</span> <span class="p">(</span><span class="n">update</span> <span class="n">genomic</span> <span class="n">coordinates</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update genomic coordinates based on variant ID, from per chrom files (optional)</span>
+<span class="p">[</span><span class="n">update_coordinate</span><span class="p">]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
 <span class="c1"># Path containing files for coordinate update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
@@ -612,9 +620,8 @@ Sections
         <span class="n">idx2</span> <span class="o">=</span> <span class="n">idx1</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
         <span class="n">idx3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">out2_sub</span><span class="err">$</span><span class="n">variant_id</span><span class="p">)</span>
         <span class="n">idx4</span> <span class="o">=</span> <span class="n">idx3</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
-        <span class="n">out2_sub_new</span> <span class="o">=</span> <span class="n">out2_sub</span>
-        <span class="n">out2_sub_new</span><span class="p">[</span><span class="n">idx4</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dbfile</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;V${columns[1]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[2]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[3]}&quot;</span><span class="p">)]</span>
-        <span class="n">out2</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out2</span><span class="err">$</span><span class="nb">chr</span> <span class="o">==</span> <span class="n">numchr</span><span class="p">),</span> <span class="p">]</span> <span class="o">=</span> <span class="n">out2_sub_new</span>
+        <span class="n">out2_sub</span><span class="p">[</span><span class="n">idx4</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dbfile</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;V${columns[1]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[2]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[3]}&quot;</span><span class="p">)]</span>
+        <span class="n">out2</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out2</span><span class="err">$</span><span class="nb">chr</span> <span class="o">==</span> <span class="n">numchr</span><span class="p">),</span> <span class="p">]</span> <span class="o">=</span> <span class="n">out2_sub</span>
         <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;Genomic coordinate updated for chromosome&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="p">}</span>
     <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">out2</span><span class="p">,</span> <span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
@@ -655,7 +662,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/e7c10d610b8fe2092d0a7167d70f4da7a59c4f0b/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 21:02:42 2019 <a href="http://github.com/gaow/fine-mapping/commit/e7c10d610b8fe2092d0a7167d70f4da7a59c4f0b">revision 9, e7c10d6</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/485db75b06d886487606ad2e6fe96cdfc22c1602/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 21:35:06 2019 <a href="http://github.com/gaow/fine-mapping/commit/485db75b06d886487606ad2e6fe96cdfc22c1602">revision 10, 485db75</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

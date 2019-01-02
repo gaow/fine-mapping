@@ -542,7 +542,7 @@ Sections
 <span class="c1"># Path containing files for variant ID update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
 <span class="kn">parameter:</span> <span class="n">id_map_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
-<span class="kn">parameter:</span> <span class="n">id_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;.bim&#39;</span>
+<span class="kn">parameter:</span> <span class="n">id_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;bim&#39;</span>
 <span class="c1"># columns first element for variant ID, 2nd element for genomic position</span>
 <span class="c1"># is [2,4] for BIM files</span>
 <span class="kn">parameter:</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
@@ -596,7 +596,7 @@ Sections
 <span class="c1"># Path containing files for coordinate update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
 <span class="kn">parameter:</span> <span class="n">coordinate_map_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
-<span class="kn">parameter:</span> <span class="n">coordinate_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;.bim&#39;</span>
+<span class="kn">parameter:</span> <span class="n">coordinate_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;bim&#39;</span>
 <span class="c1"># coordinate identifier</span>
 <span class="kn">parameter:</span> <span class="n">coordinate_version_id</span> <span class="o">=</span> <span class="s1">&#39;hgX&#39;</span>
 <span class="c1"># columns first element for variant ID, 2nd element for genomic position</span>
@@ -650,9 +650,7 @@ Sections
     <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">~/</span><span class="n">tmp</span><span class="o">/</span><span class="mo">01</span><span class="o">-</span><span class="n">Jan</span><span class="o">-</span><span class="mi">2019</span> \
     <span class="o">--</span><span class="n">pattern</span> <span class="n">uniform</span><span class="o">.</span><span class="n">SuSiE_B</span><span class="o">.</span><span class="n">L_5</span><span class="o">.</span><span class="n">prior_0p005</span><span class="o">.</span><span class="n">res_var_false</span> \
     <span class="o">--</span><span class="nb">id</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">project2</span><span class="o">/</span><span class="n">mstephens</span><span class="o">/</span><span class="n">SuSIE_gtex_CPP</span><span class="o">/</span><span class="n">rsID_map</span><span class="o">/</span><span class="n">Hg38</span><span class="o">/</span><span class="mi">1000</span><span class="n">G</span><span class="o">.</span><span class="n">EUR</span><span class="o">.</span><span class="n">hg38</span> \
-    <span class="o">--</span><span class="nb">id</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">suffix</span> <span class="n">bim</span> \
     <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">project2</span><span class="o">/</span><span class="n">mstephens</span><span class="o">/</span><span class="n">SuSIE_gtex_CPP</span><span class="o">/</span><span class="n">rsID_map</span><span class="o">/</span><span class="n">Hg37</span><span class="o">/</span><span class="mi">1000</span><span class="n">G</span><span class="o">.</span><span class="n">EUR</span><span class="o">.</span><span class="n">QC</span> \
-    <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">suffix</span> <span class="n">bim</span> \
     <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="n">version</span><span class="o">-</span><span class="nb">id</span> <span class="n">hg37</span>
 </pre></div>
 
@@ -663,7 +661,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/d79bc7fe1cd6449dfe57cf3544f741f1c5c9c82b/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 21:56:40 2019 <a href="http://github.com/gaow/fine-mapping/commit/d79bc7fe1cd6449dfe57cf3544f741f1c5c9c82b">revision 11, d79bc7f</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/54f7963b84b9e1c8732cb956b8a424ac87703468/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 22:04:13 2019 <a href="http://github.com/gaow/fine-mapping/commit/54f7963b84b9e1c8732cb956b8a424ac87703468">revision 12, 54f7963</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

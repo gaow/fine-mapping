@@ -1,0 +1,442 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="ipynb_website:version" content="0.9.6" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" type="text/css" href="../css/jt.css">
+
+<link rel="stylesheet" type="text/css" href="../css/toc2.css">
+
+<link href="../site_libs/jqueryui-1.11.4/jquery-ui.css">
+<link rel="stylesheet" href="../site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="../site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<link rel="stylesheet"
+      href="../site_libs/highlightjs/null.min.css"
+      type="text/css" />
+
+<script src="../site_libs/highlightjs/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+<script src="../js/doc_toc.js"></script>
+<script src="../js/docs.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+        },
+        "HTML-CSS": {
+            preferredFont: "TeX",
+            availableFonts: ["TeX"],
+            styles: {
+                scale: 110,
+                ".MathJax_Display": {
+                    "font-size": "110%",
+                }
+            }
+        }
+    });
+</script>
+<script>
+function filterDataFrame(id) {
+    var input = document.getElementById("search_" + id);
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("dataframe_" + id);
+    var tr = table.getElementsByTagName("tr");
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < tr.length; i++) {
+        for (var j = 0; j < tr[i].cells.length; ++j) {
+            var matched = false;
+            if (tr[i].cells[j].innerHTML.toUpperCase().indexOf(filter) != -1) {
+                tr[i].style.display = "";
+                matched = true
+                break;
+            }
+            if (!matched)
+                tr[i].style.display = "none";
+        }
+    }
+}
+function sortDataFrame(id, n, dtype) {
+    var table = document.getElementById("dataframe_" + id);
+    var tb = table.tBodies[0]; // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
+    var tr = Array.prototype.slice.call(tb.rows, 0); // put rows into array
+    if (dtype === 'numeric') {
+        var fn = function(a, b) { 
+            return parseFloat(a.cells[n].textContent) <= parseFloat(b.cells[n].textContent) ? -1 : 1;
+        }
+    } else {
+        var fn = function(a, b) {
+            var c = a.cells[n].textContent.trim().localeCompare(b.cells[n].textContent.trim()); 
+            return c > 0 ? 1 : (c < 0 ? -1 : 0) }
+    }
+    var isSorted = function(array, fn) {
+        if (array.length < 2)
+            return 1;
+        var direction = fn(array[0], array[1]); 
+        for (var i = 1; i < array.length - 1; ++i) {
+            var d = fn(array[i], array[i+1]);
+            if (d == 0)
+                continue;
+            else if (direction == 0)
+                direction = d;
+            else if (direction != d)
+                return 0;
+            }
+        return direction;
+    }
+    var sorted = isSorted(tr, fn);
+    if (sorted == 1 || sorted == -1) {
+        // if sorted already, reverse it
+        for(var i = tr.length - 1; i >= 0; --i)
+            tb.appendChild(tr[i]); // append each row in order
+    } else {
+        tr = tr.sort(fn);
+        for(var i = 0; i < tr.length; ++i)
+            tb.appendChild(tr[i]); // append each row in order
+    }
+}
+</script>
+
+<script>
+$( document ).ready(function(){
+            var cfg={'threshold':3,     // depth of toc (number of levels)
+             'number_sections': false,
+             'toc_cell': false,          // useless here
+             'toc_window_display': true, // display the toc window
+             "toc_section_display": "block", // display toc contents in the window
+             'sideBar':true,       // sidebar or floating window
+             'navigate_menu':false       // navigation menu (only in liveNotebook -- do not change)
+            }
+            var st={};                  // some variables used in the script
+            st.rendering_toc_cell = false;
+            st.config_loaded = false;
+            st.extension_initialized=false;
+            st.nbcontainer_marginleft = $('#notebook-container').css('margin-left')
+            st.nbcontainer_marginright = $('#notebook-container').css('margin-right')
+            st.nbcontainer_width = $('#notebook-container').css('width')
+            st.oldTocHeight = undefined
+            st.cell_toc = undefined;
+            st.toc_index=0;
+            // fire the main function with these parameters
+            table_of_contents(cfg, st);
+            var file=workflowDict[$("h1:first").attr("id")];
+            $("#toc-level0 a").css("color","#126dce");
+            $('a[href="#'+$("h1:first").attr("id")+'"]').hide()
+            var docs=workflowArray;
+            var docs_map=workflowArrayMap;
+            var pos=workflowArray.indexOf(file);
+            for (var a=pos;a>=0;a--){
+                  $('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>').insertBefore("#toc-level0 li:eq(0)");
+            }
+            $('a[href="'+file+'.html'+'"]').css("color","#126dce");
+            for (var a=pos+1;a<docs.length;a++){
+                  $(".toc #toc-level0").append('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>');
+            }
+            // $("#toc-header").hide(); // comment out because it prevents search bar from displaying
+    });
+</script>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+  // mark it active
+  menuAnchor.parent().addClass('active');
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+<div class="container-fluid main-container">
+<!-- tabsets -->
+<script src="../site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+
+
+<title>fine-mapping</title>
+
+<style type = "text/css">
+body {
+  font-family: "Droid Sans";
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+</style>
+</head>
+
+<body>
+<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="container" id="notebook-container">
+
+<!-- code folding -->
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html">fine-mapping</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+<li>
+  <a href="../index.html">Overview</a>
+</li>
+        
+<li>
+  <a href="../workflow.html">Workflow</a>
+</li>
+        
+      </ul>
+        
+<ul class="nav navbar-nav navbar-right">
+<li>
+   <a href="http://github.com/gaow/fine-mapping"> <span class="fa fa-github"></span> </a>
+</li>
+</ul>
+        
+      </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Fine-mapping-result-post-processing">Fine-mapping result post processing<a class="anchor-link" href="#Fine-mapping-result-post-processing">&#182;</a></h1><p>This pipeline consolidates results from various fine-mapping tools to uniform format, add rsID as necessary, and perform a simple "liftover" via rsID (not the formal UCSC <code>liftOver</code>) to generate output in HG37 and HG38 builds.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Input-data">Input data<a class="anchor-link" href="#Input-data">&#182;</a></h2><p>Input are results of fine-mapping pipeline <code>summary_statistics_finemapping.ipynb</code> in R's <code>RDS</code> format for SuSiE and CAVIAR, and <code>pkl</code> format for DAP.</p>
+<h2 id="Output-data">Output data<a class="anchor-link" href="#Output-data">&#182;</a></h2><p>columns are:</p>
+
+<pre><code>chr pos ref alt snp_id locus_id PIP CS</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>where <code>snp_id</code> will be rsID if some annotation files on rsID are provided. Otherwise it will take the format of <code>chr:pos:ref:alt</code>.</p>
+<h2 id="Additional-data-processing">Additional data processing<a class="anchor-link" href="#Additional-data-processing">&#182;</a></h2><p>Here we also provide additional routines to process the data,</p>
+<ol>
+<li>Swap the <code>snp_id</code> column using external annotations, for example by rsID.</li>
+<li>Liftover to other builds -- we only support it via rsID matching</li>
+</ol>
+<p>Notice that only the first 5 columns are necessary for these additional operations. The columns after the fifth can be arbitary and will be kept during the process.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">cd</span> <span class="o">~/</span><span class="n">GIT</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">fine</span><span class="o">-</span><span class="n">mapping</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>/home/gaow/Documents/GIT/github/fine-mapping</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="The-workflow">The workflow<a class="anchor-link" href="#The-workflow">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">finemapping_results_wrangler</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>usage: sos run workflow/finemapping_results_wrangler.ipynb
+               [workflow_name | -t targets] [options] [workflow_options]
+  workflow_name:        Single or combined workflows defined in this script
+  targets:              One or more targets to generate
+  options:              Single-hyphen sos parameters (see &#34;sos run -h&#34; for details)
+  workflow_options:     Double-hyphen workflow-specific parameters
+
+Workflows:
+  default
+
+Sections
+  default:
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="c1"># summary statistics file prefix</span>
+<span class="c1"># which is the path to all output files</span>
+<span class="kn">parameter:</span> <span class="n">ss_data_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="c1"># identifier for fine-mapping results to be extracted</span>
+<span class="kn">parameter:</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;uniform.SuSiE_B.L_5.prior_0p005.res_var_false&quot;</span>
+
+<span class="k">if</span> <span class="s1">&#39;SuSiE&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;susie&#39;</span>
+<span class="k">elif</span> <span class="s1">&#39;CAVIAR&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;CAVIAR&#39;</span>
+<span class="k">elif</span> <span class="s1">&#39;DAP&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;DAP&#39;</span>
+<span class="kn">else:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid --pattern specification&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">default_1</span> <span class="p">(</span><span class="n">extract</span> <span class="n">results</span> <span class="n">to</span> <span class="n">single</span> <span class="nb">file</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
+<span class="c1"># Keep PIP above these thresholds</span>
+<span class="kn">parameter:</span> <span class="n">pip_thresh</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="c1"># Round PIP to given digits</span>
+<span class="kn">parameter:</span> <span class="n">round_off</span> <span class="o">=</span> <span class="mi">6</span>
+<span class="kn">input:</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/*/*.{pattern}.{ext}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rds&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data_prefix:a}.{pattern}.gz&quot;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">ss_data_prefix</span>
+    <span class="c1"># Here we define get_*_output functions for different output format</span>
+    <span class="n">get_susie_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">cs_id</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">))</span>
+        <span class="n">num_cs</span> <span class="o">=</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">sets</span><span class="err">$</span><span class="n">cs</span><span class="p">)</span>
+        <span class="k">for</span><span class="p">(</span><span class="nb">id</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">num_cs</span><span class="p">){</span>
+            <span class="n">cs_id</span><span class="p">[</span><span class="n">rds_file</span><span class="err">$</span><span class="n">sets</span><span class="err">$</span><span class="n">cs</span><span class="p">[[</span><span class="nb">id</span><span class="p">]]]</span> <span class="o">=</span> <span class="nb">id</span>
+        <span class="p">}</span>
+        <span class="n">cbind</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="n">gene_names_rds</span><span class="p">[</span><span class="n">gene_id</span><span class="p">],</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">)),</span> 
+                              <span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">,</span> 
+                              <span class="n">rds_file</span><span class="err">$</span><span class="n">pip</span><span class="p">,</span> <span class="n">cs_id</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="c1"># Data extraction script</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">paths</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">ss_data_prefix</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_input</span><span class="p">]):</span><span class="n">r</span><span class="p">,})</span>
+    <span class="n">processed_dat</span> <span class="o">=</span> <span class="n">c</span><span class="p">()</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">rds_file</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">read_dsc</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+      <span class="n">unit</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+      <span class="n">processed_dat_temp</span> <span class="o">=</span> <span class="n">get_</span><span class="err">$</span><span class="p">{</span><span class="n">pattern</span><span class="p">}</span><span class="n">_output</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span>
+      <span class="n">colnames</span><span class="p">(</span><span class="n">processed_dat_temp</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;locus_id&quot;</span><span class="p">,</span> <span class="s2">&quot;variant_id&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span><span class="p">)</span>
+      <span class="n">processed_dat</span> <span class="o">=</span> <span class="n">rbind</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">,</span> <span class="n">processed_dat_temp</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">processed_dat_temp</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">}</span> <span class="o">|</span> <span class="n">processed_dat_temp</span><span class="p">[,</span><span class="mi">4</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span> <span class="p">])</span>
+      <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;We are at unit&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">extract_chr</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">return</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">strsplit</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;:&quot;</span><span class="p">)[[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">1</span><span class="p">])))</span>
+    <span class="n">extract_pos</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">return</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">strsplit</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;:&quot;</span><span class="p">)[[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">2</span><span class="p">])))</span>
+    <span class="n">extract_ref</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">return</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">strsplit</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;:&quot;</span><span class="p">)[[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">3</span><span class="p">])))</span>
+    <span class="n">extract_alt</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">[,</span><span class="mi">2</span><span class="p">],</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">return</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">strsplit</span><span class="p">(</span><span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="s2">&quot;:&quot;</span><span class="p">)[[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">4</span><span class="p">])))</span>
+    <span class="n">variant_id</span> <span class="o">=</span> <span class="n">processed_dat</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">locus_id</span> <span class="o">=</span> <span class="n">processed_dat</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">pip</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">[,</span><span class="mi">3</span><span class="p">],</span> <span class="err">$</span><span class="p">{</span><span class="n">round_off</span><span class="p">})</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">processed_dat</span><span class="p">[,</span><span class="mi">4</span><span class="p">]</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="s2">&quot;chr&quot;</span> <span class="o">=</span> <span class="n">extract_chr</span><span class="p">,</span> <span class="s2">&quot;pos&quot;</span> <span class="o">=</span> <span class="n">extract_pos</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span> <span class="o">=</span> <span class="n">extract_ref</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span> <span class="o">=</span> <span class="n">extract_alt</span><span class="p">,</span> 
+                    <span class="s2">&quot;variant_id&quot;</span> <span class="o">=</span> <span class="n">variant_id</span><span class="p">,</span> <span class="s2">&quot;locus_id&quot;</span> <span class="o">=</span> <span class="n">locus_id</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span> <span class="o">=</span> <span class="n">pip</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span> <span class="o">=</span> <span class="n">cs</span><span class="p">)</span>
+    <span class="n">df_sorted</span> <span class="o">=</span> <span class="n">df</span> <span class="p">[</span><span class="n">order</span><span class="p">(</span><span class="n">df</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">df</span><span class="p">[,</span><span class="mi">2</span><span class="p">]),]</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">df_sorted</span><span class="p">,</span> <span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<hr>
+Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/ab3a018e6e940e2184d7ffaebf6c5bdca711d04b/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 18:43:05 2019 <a href="http://github.com/gaow/fine-mapping/commit/ab3a018e6e940e2184d7ffaebf6c5bdca711d04b">revision 1, ab3a018</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+</div>
+</div>
+</body>
+</html>

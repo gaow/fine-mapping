@@ -276,7 +276,7 @@ body {
 <p>Notice that only the first 5 columns are necessary for these additional operations. The columns after the fifth can be arbitary and will be kept during the process.</p>
 <ul>
 <li>To trigger optional step 1, parameter <code>--id-map-prefix</code> and <code>--id-map-suffix</code> have to be valid.</li>
-<li>To trigger optional step 2, parameter <code>--build-map-prefix</code> and <code>--build-map-suffix</code> have to be valid.</li>
+<li>To trigger optional step 2, parameter <code>--coordinate-map-prefix</code> and <code>--coordinate-map-suffix</code> have to be valid.</li>
 </ul>
 
 </div>
@@ -401,6 +401,14 @@ Sections
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Fine-mapping-results-consolidation">Fine-mapping results consolidation<a class="anchor-link" href="#Fine-mapping-results-consolidation">&#182;</a></h2>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
@@ -416,7 +424,7 @@ Sections
 <span class="kn">input:</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/*/*.{pattern}.{ext}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rds&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]]</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data_prefix:a}.{pattern}.gz&quot;</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;Cannot find valid input files by pattern {ss_data_prefix:a}/*/*.{pattern}.[rds,pkl]&#39;</span><span class="p">)</span>
-<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">ss_data_prefix</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">ss_data_prefix</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="c1"># Here we define get_*_output functions for different output format</span>
     <span class="n">get_susie_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
         <span class="n">cs_id</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">))</span>
@@ -460,44 +468,109 @@ Sections
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Update-variant-ID-via-genomic-coordinantes">Update variant ID via genomic coordinantes<a class="anchor-link" href="#Update-variant-ID-via-genomic-coordinantes">&#182;</a></h2>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Optional step: update variant ID</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update variant ID based on chrom and pos (optional)</span>
 <span class="p">[</span><span class="n">default_2</span> <span class="p">(</span><span class="n">update</span> <span class="n">variant</span> <span class="n">ID</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
 <span class="c1"># Path containing files for variant ID update rule</span>
 <span class="c1"># Each file is a separate chromsome</span>
 <span class="kn">parameter:</span> <span class="n">id_map_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="kn">parameter:</span> <span class="n">id_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;.bim&#39;</span>
-<span class="c1"># columns first element for position, 2nd element for variant ID</span>
-<span class="c1"># is [4,2] for BIM files</span>
-<span class="kn">parameter:</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="c1"># columns first element for variant ID, 2nd element for genomic position</span>
+<span class="c1"># is [2,4] for BIM files</span>
+<span class="kn">parameter:</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
 <span class="c1"># chromosome identifiers</span>
 <span class="kn">parameter:</span> <span class="n">chroms</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">)]</span>
-<span class="n">stop_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{id_map_prefix:a}/*.{id_map_suffix}&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Variant ID are not updated because no valid file is found using --id-map-prefix and --id-map-suffix&#39;</span><span class="p">)</span>
+<span class="n">stop_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{id_map_prefix:a}.*.{id_map_suffix}&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Variant ID are not updated because no valid file is found using --id-map-prefix and --id-map-suffix&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.var_id_updated.gz&#39;</span>
-<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span>
-    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
-    <span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
+    <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">))</span>
+    <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">))</span>
     <span class="n">out</span> <span class="o">=</span>  <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="s2">&quot;zcat ${_input}&quot;</span><span class="p">))</span>
     <span class="n">out</span> <span class="o">%&gt;%</span> <span class="n">mutate_if</span><span class="p">(</span><span class="ow">is</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">out</span>
     <span class="n">chroms</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">paths</span><span class="p">(</span><span class="n">chroms</span><span class="p">):</span><span class="n">r</span><span class="p">,})</span>
     <span class="k">for</span><span class="p">(</span><span class="n">numchr</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">){</span>
         <span class="n">which_chr</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="n">out</span><span class="err">$</span><span class="nb">chr</span> <span class="o">==</span> <span class="n">numchr</span><span class="p">)</span>
         <span class="n">out_sub</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="n">which_chr</span><span class="p">,</span> <span class="p">]</span>
-        <span class="n">dbfile</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;${id_map_prefix}&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;${id_map_suffix}&quot;</span><span class="p">)))</span>
+        <span class="n">dbfile</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;${id_map_prefix}.&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;.${id_map_suffix}&quot;</span><span class="p">)))</span>
         <span class="n">out_sub_new</span> <span class="o">=</span> <span class="n">out_sub</span>
-        <span class="n">idx1</span> <span class="o">=</span> <span class="n">match</span><span class="p">(</span><span class="n">out_sub</span><span class="err">$</span><span class="n">pos</span><span class="p">,</span> <span class="n">dbfile</span><span class="err">$</span><span class="n">V</span><span class="err">$</span><span class="p">{</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+        <span class="n">idx1</span> <span class="o">=</span> <span class="n">match</span><span class="p">(</span><span class="n">out_sub</span><span class="err">$</span><span class="n">pos</span><span class="p">,</span> <span class="n">dbfile</span><span class="err">$</span><span class="n">V</span><span class="err">$</span><span class="p">{</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">]})</span>
         <span class="n">idx2</span> <span class="o">=</span> <span class="n">idx1</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
         <span class="n">idx3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">out_sub</span><span class="err">$</span><span class="n">pos</span><span class="p">)</span>
         <span class="n">idx4</span> <span class="o">=</span> <span class="n">idx3</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
-        <span class="n">out_sub_new</span><span class="p">[</span><span class="n">idx4</span><span class="p">,</span> <span class="s2">&quot;variant_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dbfile</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span><span class="s2">&quot;V${columns[1]}&quot;</span><span class="p">]</span>
+        <span class="n">out_sub_new</span><span class="p">[</span><span class="n">idx4</span><span class="p">,</span> <span class="s2">&quot;variant_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dbfile</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span><span class="s2">&quot;V${columns[0]}&quot;</span><span class="p">]</span>
         <span class="n">out</span><span class="p">[</span><span class="n">which_chr</span><span class="p">,</span> <span class="p">]</span> <span class="o">=</span> <span class="n">out_sub_new</span>
-        <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;Replaced IDs for chr&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;Variant IDs updated for chromosome&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="p">}</span>
-    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">})),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Update-genomic-coordinates-via-variant-ID">Update genomic coordinates via variant ID<a class="anchor-link" href="#Update-genomic-coordinates-via-variant-ID">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Update genomic coordinates based on variant ID (optional)</span>
+<span class="p">[</span><span class="n">default_3</span> <span class="p">(</span><span class="n">update</span> <span class="n">genomic</span> <span class="n">coordinates</span> <span class="kn">from</span> <span class="nn">per</span> <span class="nn">chrom</span> <span class="nn">files</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;rlang&gt;=0.3.0&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;data.table&#39;</span><span class="p">)</span>
+<span class="c1"># Path containing files for coordinate update rule</span>
+<span class="c1"># Each file is a separate chromsome</span>
+<span class="kn">parameter:</span> <span class="n">coordinate_map_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="kn">parameter:</span> <span class="n">coordinate_map_suffix</span> <span class="o">=</span> <span class="s1">&#39;.bim&#39;</span>
+<span class="c1"># coordinate identifier</span>
+<span class="kn">parameter:</span> <span class="n">coordinate_version_id</span> <span class="o">=</span> <span class="s1">&#39;hgX&#39;</span>
+<span class="c1"># columns first element for variant ID, 2nd element for genomic position</span>
+<span class="c1"># 3rd for reference allele and 4th for alternative allele</span>
+<span class="c1"># is [2,4,5,6] for BIM files</span>
+<span class="kn">parameter:</span> <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">]</span>
+<span class="c1"># chromosome identifiers</span>
+<span class="kn">parameter:</span> <span class="n">chroms</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">22</span><span class="p">)]</span>
+<span class="n">stop_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{coordinate_map_prefix:a}.*.{coordinate_map_suffix}&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Genomic coordinates are not updated because no valid file is found using --coordinate-map-prefix and --coordinate-map-suffix&#39;</span><span class="p">)</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.{coordinate_version_id}.gz&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.var_id_updated.&#39;</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
+    <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">))</span>
+    <span class="n">suppressMessages</span><span class="p">(</span><span class="n">library</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">table</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span>  <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="s2">&quot;zcat ${_input}&quot;</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">%&gt;%</span> <span class="n">mutate_if</span><span class="p">(</span><span class="ow">is</span><span class="o">.</span><span class="n">factor</span><span class="p">,</span> <span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">out2</span>
+    <span class="n">chroms</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">paths</span><span class="p">(</span><span class="n">chroms</span><span class="p">):</span><span class="n">r</span><span class="p">,})</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">numchr</span> <span class="ow">in</span> <span class="n">chroms</span><span class="p">){</span>
+        <span class="n">dbfile</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">fread</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;${coordinate_map_prefix}.&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;.${coordinate_map_suffix}&quot;</span><span class="p">)))</span>
+        <span class="n">out2_sub</span> <span class="o">=</span> <span class="n">out2</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out2</span><span class="err">$</span><span class="nb">chr</span> <span class="o">==</span> <span class="n">numchr</span><span class="p">),</span> <span class="p">]</span>
+        <span class="n">idx1</span> <span class="o">=</span> <span class="n">match</span><span class="p">(</span><span class="n">out2_sub</span><span class="err">$</span><span class="n">variant_id</span><span class="p">,</span> <span class="n">dbfile</span><span class="err">$</span><span class="n">V</span><span class="err">$</span><span class="p">{</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+        <span class="n">idx2</span> <span class="o">=</span> <span class="n">idx1</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
+        <span class="n">idx3</span> <span class="o">=</span> <span class="mi">1</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">out2_sub</span><span class="err">$</span><span class="n">variant_id</span><span class="p">)</span>
+        <span class="n">idx4</span> <span class="o">=</span> <span class="n">idx3</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">idx1</span><span class="p">))]</span>
+        <span class="n">out2_sub_new</span> <span class="o">=</span> <span class="n">out2_sub</span>
+        <span class="n">out2_sub_new</span><span class="p">[</span><span class="n">idx4</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;pos&quot;</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="s2">&quot;alt&quot;</span><span class="p">)]</span> <span class="o">=</span> <span class="n">dbfile</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;V${columns[1]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[2]}&quot;</span><span class="p">,</span> <span class="s2">&quot;V${columns[3]}&quot;</span><span class="p">)]</span>
+        <span class="n">out2</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out2</span><span class="err">$</span><span class="nb">chr</span> <span class="o">==</span> <span class="n">numchr</span><span class="p">),</span> <span class="p">]</span> <span class="o">=</span> <span class="n">out2_sub_new</span>
+        <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;Genomic coordinate updated for chromosome&quot;</span><span class="p">,</span> <span class="n">numchr</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">out2</span><span class="p">,</span> <span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}),</span> <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -520,7 +593,12 @@ Sections
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">finemapping_results_wrangler</span><span class="o">.</span><span class="n">ipynb</span> \
     <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">~/</span><span class="n">tmp</span><span class="o">/</span><span class="mo">01</span><span class="o">-</span><span class="n">Jan</span><span class="o">-</span><span class="mi">2019</span> \
-    <span class="o">--</span><span class="n">pattern</span> <span class="n">uniform</span><span class="o">.</span><span class="n">SuSiE_B</span><span class="o">.</span><span class="n">L_5</span><span class="o">.</span><span class="n">prior_0p005</span><span class="o">.</span><span class="n">res_var_false</span>
+    <span class="o">--</span><span class="n">pattern</span> <span class="n">uniform</span><span class="o">.</span><span class="n">SuSiE_B</span><span class="o">.</span><span class="n">L_5</span><span class="o">.</span><span class="n">prior_0p005</span><span class="o">.</span><span class="n">res_var_false</span> \
+    <span class="o">--</span><span class="nb">id</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">project2</span><span class="o">/</span><span class="n">mstephens</span><span class="o">/</span><span class="n">SuSIE_gtex_CPP</span><span class="o">/</span><span class="n">rsID_map</span><span class="o">/</span><span class="n">Hg38</span><span class="o">/</span><span class="mi">1000</span><span class="n">G</span><span class="o">.</span><span class="n">EUR</span><span class="o">.</span><span class="n">hg38</span> \
+    <span class="o">--</span><span class="nb">id</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">suffix</span> <span class="n">bim</span> \
+    <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">project2</span><span class="o">/</span><span class="n">mstephens</span><span class="o">/</span><span class="n">SuSIE_gtex_CPP</span><span class="o">/</span><span class="n">rsID_map</span><span class="o">/</span><span class="n">Hg37</span><span class="o">/</span><span class="mi">1000</span><span class="n">G</span><span class="o">.</span><span class="n">EUR</span><span class="o">.</span><span class="n">QC</span> \
+    <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="nb">map</span><span class="o">-</span><span class="n">suffix</span> <span class="n">bim</span> \
+    <span class="o">--</span><span class="n">coordinate</span><span class="o">-</span><span class="n">version</span><span class="o">-</span><span class="nb">id</span> <span class="n">hg37</span>
 </pre></div>
 
 </div>
@@ -530,7 +608,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/92e9054da83224e03937a31923b5a27cf6b5e675/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 19:33:50 2019 <a href="http://github.com/gaow/fine-mapping/commit/92e9054da83224e03937a31923b5a27cf6b5e675">revision 4, 92e9054</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/908607cef08594153c75d3eef3c4118ed8de6dc6/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 20:17:23 2019 <a href="http://github.com/gaow/fine-mapping/commit/908607cef08594153c75d3eef3c4118ed8de6dc6">revision 6, 908607c</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

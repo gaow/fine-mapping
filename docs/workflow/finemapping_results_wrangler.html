@@ -246,6 +246,15 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<p>This pipeline was devised by Gao Wang and implemented by Gao Wang and Kushal Dey at Harvard University.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Input-data">Input data<a class="anchor-link" href="#Input-data">&#182;</a></h2><p>Input are results of fine-mapping pipeline <code>summary_statistics_finemapping.ipynb</code> in R's <code>RDS</code> format for SuSiE and CAVIAR, and <code>pkl</code> format for DAP.</p>
 <h2 id="Output-data">Output data<a class="anchor-link" href="#Output-data">&#182;</a></h2><p>columns are:</p>
 
@@ -339,8 +348,20 @@ body {
 Workflows:
   default
 
+Global Workflow Options:
+  --ss-data-prefix . (as path)
+                        summary statistics file prefix which is the path to all
+                        output files
+  --pattern &#39;uniform.SuSiE_B.L_5.prior_0p005.res_var_false&#39;
+                        identifier for fine-mapping results to be extracted
+
 Sections
-  default:
+  default_1:
+    Workflow Options:
+      --pip-thresh 0.05 (as float)
+                        Keep PIP above these thresholds
+      --round-off 6 (as int)
+                        Round PIP to given digits
 </pre>
 </div>
 </div>
@@ -389,6 +410,7 @@ Sections
 <span class="kn">parameter:</span> <span class="n">round_off</span> <span class="o">=</span> <span class="mi">6</span>
 <span class="kn">input:</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix:a}/*/*.{pattern}.{ext}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rds&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]]</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data_prefix:a}.{pattern}.gz&quot;</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;Cannot find valid input files by pattern {ss_data_prefix:a}/*/*.{pattern}.[rds,pkl]&#39;</span><span class="p">)</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">ss_data_prefix</span>
     <span class="c1"># Here we define get_*_output functions for different output format</span>
     <span class="n">get_susie_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
@@ -397,7 +419,7 @@ Sections
         <span class="k">for</span><span class="p">(</span><span class="nb">id</span> <span class="ow">in</span> <span class="mi">1</span><span class="p">:</span><span class="n">num_cs</span><span class="p">){</span>
             <span class="n">cs_id</span><span class="p">[</span><span class="n">rds_file</span><span class="err">$</span><span class="n">sets</span><span class="err">$</span><span class="n">cs</span><span class="p">[[</span><span class="nb">id</span><span class="p">]]]</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="p">}</span>
-        <span class="n">cbind</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="n">gene_names_rds</span><span class="p">[</span><span class="n">gene_id</span><span class="p">],</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">)),</span> 
+        <span class="n">cbind</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">)),</span> 
                               <span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">,</span> 
                               <span class="n">rds_file</span><span class="err">$</span><span class="n">pip</span><span class="p">,</span> <span class="n">cs_id</span><span class="p">)</span>
     <span class="p">}</span>
@@ -408,7 +430,7 @@ Sections
     <span class="k">for</span> <span class="p">(</span><span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">)</span> <span class="p">{</span>
       <span class="n">rds_file</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">read_dsc</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
       <span class="n">unit</span> <span class="o">=</span> <span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-      <span class="n">processed_dat_temp</span> <span class="o">=</span> <span class="n">get_</span><span class="err">$</span><span class="p">{</span><span class="n">pattern</span><span class="p">}</span><span class="n">_output</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span>
+      <span class="n">processed_dat_temp</span> <span class="o">=</span> <span class="n">get_</span><span class="err">$</span><span class="p">{</span><span class="n">source</span><span class="p">}</span><span class="n">_output</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span>
       <span class="n">colnames</span><span class="p">(</span><span class="n">processed_dat_temp</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;locus_id&quot;</span><span class="p">,</span> <span class="s2">&quot;variant_id&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span><span class="p">)</span>
       <span class="n">processed_dat</span> <span class="o">=</span> <span class="n">rbind</span><span class="p">(</span><span class="n">processed_dat</span><span class="p">,</span> <span class="n">processed_dat_temp</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">processed_dat_temp</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">}</span> <span class="o">|</span> <span class="n">processed_dat_temp</span><span class="p">[,</span><span class="mi">4</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">),</span> <span class="p">])</span>
       <span class="n">cat</span><span class="p">(</span><span class="s2">&quot;We are at unit&quot;</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -433,9 +455,32 @@ Sections
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Example-run">Example run<a class="anchor-link" href="#Example-run">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">finemapping_results_wrangler</span><span class="o">.</span><span class="n">ipynb</span> \
+    <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">~/</span><span class="n">tmp</span><span class="o">/</span><span class="mo">01</span><span class="o">-</span><span class="n">Jan</span><span class="o">-</span><span class="mi">2019</span> \
+    <span class="o">--</span><span class="n">pattern</span> <span class="n">uniform</span><span class="o">.</span><span class="n">SuSiE_B</span><span class="o">.</span><span class="n">L_5</span><span class="o">.</span><span class="n">prior_0p005</span><span class="o">.</span><span class="n">res_var_false</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/ab3a018e6e940e2184d7ffaebf6c5bdca711d04b/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 18:43:05 2019 <a href="http://github.com/gaow/fine-mapping/commit/ab3a018e6e940e2184d7ffaebf6c5bdca711d04b">revision 1, ab3a018</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/b5875ecaf489cdaa904e597c0e48b2be018733fb/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 1 19:04:20 2019 <a href="http://github.com/gaow/fine-mapping/commit/b5875ecaf489cdaa904e597c0e48b2be018733fb">revision 2, b5875ec</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

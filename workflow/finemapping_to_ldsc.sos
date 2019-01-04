@@ -21,6 +21,7 @@ fail_if(not data.is_file(), msg = "Please specify valid data file via --data")
 fail_if(len(glob.glob(f"{reference_snp_prefix:a}.*.bim")) == 0, msg = 'Please specify valid --reference-snp-prefix')
 
 [default]
+depends: R_library('data.table'), R_library('R.utils')
 input: data, for_each = 'chroms'
 output: f"{output_dir:a}/{output_dir:b}.{_chroms}.annot.gz"
 task: trunk_workers = 1, trunk_size = 1, walltime = '3m', mem = '2G', cores = 1, tags = f'{step_name}_{_output:bn}'
@@ -44,10 +45,11 @@ R: expand = "${ }"
     colnames(annot_new) = c("CHR", "BP", "SNP", "CM", "AN")
     common_snps = intersect(pre_annot_maxpip$SNP, annot_new$SNP)
     annot_new[match(common_snps, annot_new$SNP),5] = pre_annot_maxpip[match(common_snps, pre_annot_maxpip$SNP), "maxcpp"]
-    write.table(annot_new, file = gzfile(${_output:r}), quote=FALSE, row.names=FALSE)
     }else{
     bimfile = data.frame(fread(paste0("${reference_snp_prefix}.", numchr, ".bim")))
     annot_new = cbind.data.frame(bimfile[,1], bimfile[,4], bimfile[,2], bimfile[,3], rep(0, dim(bimfile)[1]))
     colnames(annot_new) = c("CHR", "BP", "SNP", "CM", "AN")
-    write.table(annot_new, file = gzfile(${_output:r}), quote=FALSE, row.names=FALSE)
     }
+    fwrite(annot_new, file = "${_output:n}.tmp", sep = "\t", quote=FALSE, row.names=FALSE)
+    R.utils::gzip("${_output:n}.tmp", destname=${_output:r})
+    file.remove("${_output:n}.tmp")

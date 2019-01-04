@@ -339,13 +339,13 @@ pre.section-header.CodeMirror-line {
       <div class="file">
          <div class="fileheader">
             <div class="fileinfo">
-               55 lines
+               54 lines
                <span class="file-info-divider"></span>
                2.7 kB
             </div>
          </div>
          <div class="filecontent">
-            <textarea rows="55" id="source-code" class="sos-source" name="code">#!/usr/bin/env sos-runner
+            <textarea rows="54" id="source-code" class="sos-source" name="code">#!/usr/bin/env sos-runner
 # fileformat=SOS1.0
 # Author: Kushal Dey and Gao Wang
 
@@ -398,8 +398,7 @@ R: expand = "${ }"
     colnames(annot_new) = c("CHR", "BP", "SNP", "CM", "AN")
     }
     fwrite(annot_new, file = "${_output:n}.tmp", sep = "\t", quote=FALSE, row.names=FALSE)
-    R.utils::gzip("${_output:n}.tmp", destname=${_output:r})
-    file.remove("${_output:n}.tmp")</textarea>
+    R.utils::gzip("${_output:n}.tmp", destname=${_output:r}, overwrite=TRUE, remove=TRUE)</textarea>
          </div>
       </div>
       <footer>

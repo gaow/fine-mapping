@@ -51,5 +51,4 @@ R: expand = "${ }"
     colnames(annot_new) = c("CHR", "BP", "SNP", "CM", "AN")
     }
     fwrite(annot_new, file = "${_output:n}.tmp", sep = "\t", quote=FALSE, row.names=FALSE)
-    R.utils::gzip("${_output:n}.tmp", destname=${_output:r})
-    file.remove("${_output:n}.tmp")
+    R.utils::gzip("${_output:n}.tmp", destname=${_output:r}, overwrite=TRUE, remove=TRUE)

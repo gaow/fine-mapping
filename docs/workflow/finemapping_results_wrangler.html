@@ -493,6 +493,18 @@ Sections
         <span class="n">colnames</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;locus_id&quot;</span><span class="p">,</span> <span class="s2">&quot;variant_id&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span><span class="p">,</span> <span class="s2">&quot;cs_size&quot;</span><span class="p">,</span> <span class="s2">&quot;cs_purity&quot;</span><span class="p">)</span>
         <span class="n">out</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">}</span> <span class="o">|</span> <span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">na</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">4</span><span class="p">])),</span> <span class="p">]</span>
     <span class="p">}</span>
+   
+    <span class="n">get_caviar_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">out</span> <span class="o">=</span> <span class="n">cbind</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">)),</span>
+                              <span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">,</span>
+                              <span class="n">rds_file</span><span class="err">$</span><span class="n">snp</span><span class="err">$</span><span class="n">snp_prob</span><span class="p">,</span>
+                              <span class="n">rds_file</span><span class="err">$</span><span class="n">snp</span><span class="err">$</span><span class="n">snp_prob_set</span><span class="p">)</span>
+      <span class="n">colnames</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;gene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;var_id&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span><span class="p">)</span>
+      <span class="n">out</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">})]</span>
+    <span class="p">}</span>
+
+    <span class="n">get_finemap_output</span> <span class="o">=</span> <span class="n">get_caviar_output</span>
+ 
     <span class="n">is_float</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="p">{</span><span class="ow">is</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">integer</span><span class="p">(</span><span class="n">x</span><span class="p">)}</span>
 
     <span class="c1"># Data extraction script</span>
@@ -664,7 +676,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/52993366dcfd3372bb61bf5bd5da17a32f9eaeab/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Fri Jan 4 13:21:17 2019 <a href="http://github.com/gaow/fine-mapping/commit/52993366dcfd3372bb61bf5bd5da17a32f9eaeab">revision 17, 5299336</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/5f1aa32cd6704735a26e61b7f1ff2e56861b1a92/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by minqiao on Mon Jan 14 19:21:37 2019 <a href="http://github.com/gaow/fine-mapping/commit/5f1aa32cd6704735a26e61b7f1ff2e56861b1a92">revision 19, 5f1aa32</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

@@ -730,8 +730,8 @@ Sections
     <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">}),</span> <span class="n">head</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
-          <span class="n">p_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pt</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">bhat</span> <span class="o">/</span> <span class="n">shat</span><span class="p">),</span> <span class="n">df</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
-          <span class="n">z_scores</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">qnorm</span><span class="p">(</span><span class="n">p_values</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sign</span><span class="p">(</span><span class="n">bhat</span><span class="p">)</span>
+          <span class="n">p_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pt</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]),</span> <span class="n">df</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+          <span class="n">z_scores</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">qnorm</span><span class="p">(</span><span class="n">p_values</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sign</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">])</span>
         <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
           <span class="n">z_scores</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span>
         <span class="p">}</span>
@@ -796,6 +796,136 @@ Sections
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run FINEMAP</span>
+<span class="p">[</span><span class="n">finemap_1</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;finemap&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;magrittr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
+<span class="c1"># K parameter</span>
+<span class="kn">parameter:</span> <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+<span class="c1"># Extra arguments to pass to CAVIAR</span>
+<span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;FINEMAP{&quot;.&quot;+fmtP(args) if len(args) else &quot;&quot;}&#39;</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Sample size is invalid. Please set it properly via --n.&#39;</span><span class="p">)</span>
+<span class="c1">#</span>
+<span class="kn">input:</span> <span class="n">data</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{suffix}.rds&#39;</span>
+<span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
+
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">magrittr</span><span class="p">)</span>
+
+    <span class="c1">#&#39; FINEMAP I/O</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">nnr</span><span class="p">}</span>
+    <span class="n">cfg</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span> <span class="n">prefix</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP&quot;</span><span class="p">),</span>
+                <span class="n">z</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.z&quot;</span><span class="p">),</span>
+                <span class="n">ld</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.LD.ld&quot;</span><span class="p">),</span>
+                <span class="n">ld_gz</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.LD.gz&quot;</span><span class="p">),</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.config&quot;</span><span class="p">),</span>
+                <span class="n">k</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.k&quot;</span><span class="p">),</span>
+                <span class="n">snp</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.snp&quot;</span><span class="p">),</span>
+                <span class="n">meta</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.master&quot;</span><span class="p">),</span>
+                <span class="n">log</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.log&quot;</span><span class="p">))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">}),</span> <span class="n">head</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
+   <span class="k">print</span><span class="p">(</span><span class="n">names</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+          <span class="n">p_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pt</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]),</span> <span class="n">df</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
+          <span class="n">z_scores</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">qnorm</span><span class="p">(</span><span class="n">p_values</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">sign</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">])</span>
+        <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+          <span class="n">z_scores</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span>
+        <span class="p">}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">cbind</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">],</span> <span class="n">z_scores</span><span class="p">)</span>
+        <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">cfg</span><span class="err">$</span><span class="n">z</span><span class="p">,</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">z_scores</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span>
+      <span class="n">system</span><span class="p">(</span><span class="s2">&quot;ln -s ${_input} ${_input:nnr}.FINEMAP.z&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="err">!</span><span class="ow">is</span><span class="o">.</span><span class="n">null</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">k</span><span class="p">}))</span> <span class="p">{</span>
+      <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">t</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">k</span><span class="p">}),</span><span class="n">cfg</span><span class="err">$</span><span class="n">k</span><span class="p">,</span><span class="n">quote</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">,</span><span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">F</span><span class="p">)</span>
+      <span class="n">write</span><span class="p">(</span><span class="s2">&quot;z;ld;snp;config;k;log;n-ind&quot;</span><span class="p">,</span><span class="nb">file</span><span class="o">=</span><span class="n">cfg</span><span class="err">$</span><span class="n">meta</span><span class="p">)</span>
+      <span class="n">write</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">z</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">ld</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">snp</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">config</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">k</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">log</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">},</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">),</span>
+        <span class="nb">file</span><span class="o">=</span><span class="n">cfg</span><span class="err">$</span><span class="n">meta</span><span class="p">,</span><span class="n">append</span><span class="o">=</span><span class="n">TRUE</span><span class="p">)</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="n">write</span><span class="p">(</span><span class="s2">&quot;z;ld;snp;config;log;n-ind&quot;</span><span class="p">,</span><span class="nb">file</span><span class="o">=</span><span class="n">cfg</span><span class="err">$</span><span class="n">meta</span><span class="p">)</span>
+      <span class="n">write</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">z</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">ld</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">snp</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">config</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">log</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">},</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;;&quot;</span><span class="p">),</span>
+            <span class="nb">file</span><span class="o">=</span><span class="n">cfg</span><span class="err">$</span><span class="n">meta</span><span class="p">,</span><span class="n">append</span><span class="o">=</span><span class="n">TRUE</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="c1">#&#39; Run FINEMAP 1.1</span>
+
+    <span class="n">run_finemap</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">dscrutils</span><span class="p">::</span><span class="n">run_cmd</span><span class="p">(</span><span class="n">paste</span><span class="p">(</span><span class="s2">&quot;zcat&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">ld_gz</span><span class="p">,</span> <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">ld</span><span class="p">),</span> <span class="n">ferr</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
+      <span class="n">cmd</span> <span class="o">=</span> <span class="n">paste</span><span class="p">(</span><span class="s2">&quot;finemap --sss --log&quot;</span><span class="p">,</span> <span class="s2">&quot;--in-files&quot;</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">meta</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+      <span class="n">dscrutils</span><span class="p">::</span><span class="n">run_cmd</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+      <span class="n">unlink</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">ld</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">TRUE</span><span class="p">)</span>
+      <span class="n">unlink</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">z</span><span class="p">,</span> <span class="n">force</span><span class="o">=</span><span class="n">TRUE</span><span class="p">)</span>
+      <span class="k">if</span><span class="p">(</span><span class="err">!</span><span class="nb">all</span><span class="p">(</span><span class="nb">file</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">post</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="nb">set</span><span class="p">,</span> <span class="n">cfg</span><span class="err">$</span><span class="n">log</span><span class="p">)))</span> <span class="p">{</span>
+          <span class="n">stop</span><span class="p">(</span><span class="s2">&quot;Cannot find one of the post, set, and log files&quot;</span><span class="p">)</span>
+      <span class="p">}</span>
+
+      <span class="n">log</span> <span class="o">&lt;-</span> <span class="n">readLines</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">log</span><span class="p">)</span>
+
+      <span class="c1"># read output tables</span>
+      <span class="n">snp</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">snp</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="n">TRUE</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+      <span class="n">snp</span><span class="err">$</span><span class="n">snp</span> <span class="o">=</span> <span class="k">as</span><span class="o">.</span><span class="n">character</span><span class="p">(</span><span class="n">snp</span><span class="err">$</span><span class="n">snp</span><span class="p">)</span>
+
+      <span class="n">snp</span> <span class="o">=</span> <span class="n">rank_snp</span><span class="p">(</span><span class="n">snp</span><span class="p">)</span>
+      <span class="n">config</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">config</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="n">TRUE</span><span class="p">,</span><span class="n">sep</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+
+      <span class="c1"># extract number of causal</span>
+      <span class="n">ncausal</span> <span class="o">=</span> <span class="n">finemap_extract_ncausal</span><span class="p">(</span><span class="n">cfg</span><span class="err">$</span><span class="n">log</span><span class="p">)</span>
+      <span class="k">return</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">snp</span><span class="o">=</span><span class="n">snp</span><span class="p">,</span> <span class="nb">set</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="n">ncausal</span><span class="o">=</span><span class="n">ncausal</span><span class="p">))</span>
+    <span class="p">}</span>
+
+    <span class="n">rank_snp</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">snp</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">snp</span> <span class="o">&lt;-</span> <span class="n">arrange</span><span class="p">(</span><span class="n">snp</span><span class="p">,</span> <span class="o">-</span><span class="n">snp_prob</span><span class="p">)</span> <span class="o">%&gt;%</span>
+        <span class="n">mutate</span><span class="p">(</span>
+            <span class="n">rank</span> <span class="o">=</span> <span class="n">seq</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">()),</span>
+            <span class="n">snp_prob_cumsum</span> <span class="o">=</span> <span class="n">cumsum</span><span class="p">(</span><span class="n">snp_prob</span><span class="p">)</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">snp_prob</span><span class="p">))</span> <span class="o">%&gt;%</span>
+        <span class="n">select</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">snp</span><span class="p">,</span> <span class="n">snp_prob</span><span class="p">,</span> <span class="n">snp_prob_cumsum</span><span class="p">,</span> <span class="n">snp_log10bf</span><span class="p">)</span>
+      <span class="k">return</span><span class="p">(</span><span class="n">snp</span><span class="p">)</span>    
+    <span class="p">}</span>
+  
+    <span class="n">finemap_extract_ncausal</span> <span class="o">&lt;-</span> <span class="n">function</span><span class="p">(</span><span class="n">logfile</span><span class="p">)</span>
+    <span class="p">{</span>
+      <span class="n">lines</span> <span class="o">&lt;-</span> <span class="n">grep</span><span class="p">(</span><span class="s2">&quot;-&gt;&quot;</span><span class="p">,</span> <span class="n">readLines</span><span class="p">(</span><span class="n">logfile</span><span class="p">),</span> <span class="n">value</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
+      <span class="n">lines</span> <span class="o">&lt;-</span> <span class="n">gsub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\</span><span class="s2">(|</span><span class="se">\\</span><span class="s2">)|&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">lines</span><span class="p">)</span>
+      <span class="n">splits</span> <span class="o">&lt;-</span> <span class="n">strsplit</span><span class="p">(</span><span class="n">lines</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">s+&quot;</span><span class="p">)</span>
+      <span class="n">tab</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span>
+        <span class="n">ncausal_num</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">splits</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">as</span><span class="o">.</span><span class="n">integer</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">])),</span>
+        <span class="n">ncausal_prob</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">splits</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">as</span><span class="o">.</span><span class="n">double</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">])))</span>
+      <span class="n">tab</span> <span class="o">&lt;-</span> <span class="n">mutate</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="nb">type</span> <span class="o">=</span> <span class="n">ifelse</span><span class="p">(</span><span class="n">duplicated</span><span class="p">(</span><span class="n">ncausal_num</span><span class="p">),</span> <span class="s2">&quot;post&quot;</span><span class="p">,</span> <span class="s2">&quot;prior&quot;</span><span class="p">))</span>
+      <span class="k">return</span><span class="p">(</span><span class="n">tab</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">run_finemap</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;${args}&quot;</span><span class="p">)</span>
+    <span class="n">res</span><span class="err">$</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_scores</span>
+    <span class="n">res</span><span class="err">$</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">saveRDS</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">ar</span><span class="p">})</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Make-diagnostic-plot">Make diagnostic plot<a class="anchor-link" href="#Make-diagnostic-plot">&#182;</a></h3>
 </div>
 </div>
@@ -806,7 +936,7 @@ Sections
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Summarize Fine-mapping results</span>
-<span class="p">[</span><span class="n">susie_bhat_2</span><span class="p">,</span> <span class="n">susie_z_2</span><span class="p">,</span> <span class="n">dap_2</span><span class="p">,</span> <span class="n">caviar_2</span> <span class="p">(</span><span class="n">plot</span> <span class="n">PIP</span><span class="p">)]</span>
+<span class="p">[</span><span class="o">*</span><span class="n">_2</span> <span class="p">(</span><span class="n">plot</span> <span class="n">PIP</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="kn">input:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_from</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.pdf&#39;</span>
@@ -1629,9 +1759,210 @@ INFO: Workflow caviar (ID=157b4cf09027e3f5) is executed successfully with 2 comp
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>GWAS example run:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">FINEMAP_EXE_PATH</span><span class="o">=~/</span><span class="n">GIT</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">mvarbvs</span><span class="o">/</span><span class="n">dsc</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">linux</span>
+<span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">finemap</span> \
+        <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">chunks</span><span class="o">.</span><span class="n">list</span> \
+        <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span> \
+        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">FINEMAP_EXE_PATH</span> <span class="o">--</span><span class="n">n</span> <span class="mi">500</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">SCZ</span><span class="o">/</span><span class="n">Summary_statistics</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">/</span><span class="n">chr9_84630941_84813641</span><span class="o">.</span><span class="n">FINEMAP</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">s</span> <span class="n">png</span> <span class="o">--</span><span class="n">dpi</span> <span class="mi">50</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">%preview /home/gaow/tmp/19-Dec-2018/SCZ/Summary_statistics/chr9_84630941_84813641/chr9_84630941_84813641.FINEMAP.pdf</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">> /home/gaow/tmp/19-Dec-2018/SCZ/Summary_statistics/chr9_84630941_84813641/chr9_84630941_84813641.FINEMAP.pdf (7.0 KiB):</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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"
+>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>eQTL example run:</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="n">FINEMAP_EXE_PATH</span><span class="o">=~/</span><span class="n">GIT</span><span class="o">/</span><span class="n">github</span><span class="o">/</span><span class="n">mvarbvs</span><span class="o">/</span><span class="n">dsc</span><span class="o">/</span><span class="n">modules</span><span class="o">/</span><span class="n">linux</span>
+<span class="n">sos</span> <span class="n">run</span> <span class="n">workflow</span><span class="o">/</span><span class="n">summary_statistics_finemapping</span><span class="o">.</span><span class="n">ipynb</span> <span class="n">finemap</span> \
+        <span class="o">--</span><span class="n">loci</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">one_loci</span><span class="o">.</span><span class="n">txt</span> \
+        <span class="o">--</span><span class="n">ss</span><span class="o">-</span><span class="n">data</span><span class="o">-</span><span class="n">prefix</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">gtex_metasoft_summary_stats</span> \
+        <span class="o">-</span><span class="n">b</span> <span class="err">$</span><span class="n">FINEMAP_EXE_PATH</span> <span class="o">--</span><span class="n">n</span> <span class="mi">500</span> \
+        <span class="o">-</span><span class="n">q</span> <span class="n">none</span> <span class="o">-</span><span class="n">j</span> <span class="mi">8</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">gaow</span><span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="mi">19</span><span class="o">-</span><span class="n">Dec</span><span class="o">-</span><span class="mi">2018</span><span class="o">/</span><span class="n">metasoft</span><span class="o">/</span><span class="n">gtex_metasoft_summary_stats</span><span class="o">/</span><span class="n">ENSG00000181404</span><span class="o">.</span><span class="mi">15</span><span class="o">/</span><span class="n">ENSG00000181404</span><span class="o">.</span><span class="mf">15.</span><span class="n">FINEMAP</span><span class="o">.</span><span class="n">pdf</span> <span class="o">-</span><span class="n">s</span> <span class="n">png</span> <span class="o">--</span><span class="n">dpi</span> <span class="mi">50</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">%preview /home/gaow/tmp/19-Dec-2018/metasoft/gtex_metasoft_summary_stats/ENSG00000181404.15/ENSG00000181404.15.FINEMAP.pdf</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">> /home/gaow/tmp/19-Dec-2018/metasoft/gtex_metasoft_summary_stats/ENSG00000181404.15/ENSG00000181404.15.FINEMAP.pdf (4.6 KiB):</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+
+<div class="output_png output_subarea ">
+<img src="data:image/png;base64,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"
+>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">> /home/gaow/tmp/19-Dec-2018/metasoft/gtex_metasoft_summary_stats/ENSG00000181404.15/ENSG00000181404.15.FINEMAP.pdf:</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>bash: /home/gaow/tmp/19-Dec-2018/metasoft/gtex_metasoft_summary_stats/ENSG00000181404.15/ENSG00000181404.15.FINEMAP.pdf: Permission denied
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/9dbbe4bcf03b954c3503052f680cd1ba643b78e4/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Tue Jan 15 11:35:38 2019 <a href="http://github.com/gaow/fine-mapping/commit/9dbbe4bcf03b954c3503052f680cd1ba643b78e4">revision 29, 9dbbe4b</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/55ae0807e3ea1b06355eec4bcb9c5f7a0adbdaba/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Jan 18 14:10:35 2019 <a href="http://github.com/gaow/fine-mapping/commit/55ae0807e3ea1b06355eec4bcb9c5f7a0adbdaba">revision 31, 55ae080</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

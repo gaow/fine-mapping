@@ -311,7 +311,7 @@ body {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/home/gaow/Documents/GIT/github/fine-mapping</pre>
+<pre>/scratch/midway2/gaow/GIT/github/fine-mapping</pre>
 </div>
 </div>
 
@@ -363,38 +363,40 @@ Workflows:
   update_coordinate
 
 Global Workflow Options:
+  --loci . (as path)
+                        Loci file
   --ss-data-prefix . (as path)
-                        summary statistics file prefix which is the path to all
-                        output files
+                        summary statistics file prefix
   --pattern &#39;uniform.SuSiE_B.L_5.prior_0p005.res_var_false&#39;
                         identifier for fine-mapping results to be extracted
 
 Sections
   default:
-  consolidate:          Consolidate fine-mapping results
+  consolidate:          Consolidate fine-mapping results to a single file
     Workflow Options:
       --pip-thresh 0.05 (as float)
                         Keep PIP above these thresholds
       --round-off 6 (as int)
                         Round PIP to given digits
-  update_variant_id:    Update variant ID based on chrom and pos (optional)
+  update_variant_id:    Update variant ID based on chrom and pos, from per chrom
+                        files (optional)
     Workflow Options:
       --id-map-prefix . (as path)
                         Path containing files for variant ID update rule Each
                         file is a separate chromsome
-      --id-map-suffix &#39;.bim&#39;
+      --id-map-suffix bim
       --columns 2 4 (as list)
                         columns first element for variant ID, 2nd element for
                         genomic position is [2,4] for BIM files
       --chroms 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 (as list)
                         chromosome identifiers
-  update_coordinate:    Update genomic coordinates based on variant ID
-                        (optional)
+  update_coordinate:    Update genomic coordinates based on variant ID, from per
+                        chrom files (optional)
     Workflow Options:
       --coordinate-map-prefix . (as path)
                         Path containing files for coordinate update rule Each
                         file is a separate chromsome
-      --coordinate-map-suffix &#39;.bim&#39;
+      --coordinate-map-suffix bim
       --coordinate-version-id hgX
                         coordinate identifier
       --columns 2 4 5 6 (as list)
@@ -417,19 +419,30 @@ Sections
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="c1"># Loci file</span>
+<span class="kn">parameter:</span> <span class="n">loci</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="c1"># summary statistics file prefix</span>
-<span class="c1"># which is the path to all output files</span>
 <span class="kn">parameter:</span> <span class="n">ss_data_prefix</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="c1"># identifier for fine-mapping results to be extracted</span>
 <span class="kn">parameter:</span> <span class="n">pattern</span> <span class="o">=</span> <span class="s2">&quot;uniform.SuSiE_B.L_5.prior_0p005.res_var_false&quot;</span>
 
+<span class="n">fail_if</span><span class="p">(</span><span class="ow">not</span> <span class="n">loci</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specify valid path for --loci&#39;</span><span class="p">)</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="n">ss_data_prefix</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;--ss-data-prefix should be a path not a file (usually file without extension, if using input from my data wrangling pipeline)&#39;</span><span class="p">)</span>
+
 <span class="n">ss_data_prefix</span> <span class="o">=</span> <span class="n">ss_data_prefix</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{loci:a}&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)]</span>
+<span class="n">chunks</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span> <span class="k">else</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span>
+<span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix}/{x}/{x}.summary_stats.gz&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span>
+
+
 <span class="k">if</span> <span class="s1">&#39;SuSiE&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
     <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;susie&#39;</span>
 <span class="k">elif</span> <span class="s1">&#39;CAVIAR&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
     <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;caviar&#39;</span>
 <span class="k">elif</span> <span class="s1">&#39;DAP&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
     <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;dap&#39;</span>
+<span class="k">elif</span> <span class="s1">&#39;FINEMAP&#39;</span> <span class="ow">in</span> <span class="n">pattern</span><span class="p">:</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s1">&#39;finemap&#39;</span>
 <span class="kn">else:</span>
     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid --pattern specification&quot;</span><span class="p">)</span>
 </pre></div>
@@ -473,9 +486,12 @@ Sections
 <span class="kn">parameter:</span> <span class="n">pip_thresh</span> <span class="o">=</span> <span class="mf">0.05</span>
 <span class="c1"># Round PIP to given digits</span>
 <span class="kn">parameter:</span> <span class="n">round_off</span> <span class="o">=</span> <span class="mi">6</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix}/*/*.{pattern}.{ext}&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;rds&#39;</span><span class="p">,</span> <span class="s1">&#39;pkl&#39;</span><span class="p">]]</span>
-<span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data_prefix:a}.{pattern}.gz&quot;</span>
-<span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;Cannot find valid input files by pattern {ss_data_prefix:a}/*/*.{pattern}.[rds,pkl]&#39;</span><span class="p">)</span>
+
+<span class="n">ext</span> <span class="o">=</span> <span class="s1">&#39;pkl&#39;</span> <span class="k">if</span> <span class="n">source</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;dap&#39;</span><span class="p">]</span> <span class="k">else</span> <span class="s1">&#39;rds&#39;</span>
+
+<span class="kn">input:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">([</span><span class="n">f</span><span class="s1">&#39;{ss_data_prefix}/{c}/{c}.{pattern}.{ext}&#39;</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">])</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s2">&quot;{ss_data_prefix}.{pattern}.{loci:bn}.gz&quot;</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">_input</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;Cannot find valid input files for given loci&#39;</span><span class="p">)</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">ss_data_prefix</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="c1"># Here we define get_*_output functions for different output format</span>
     <span class="n">get_susie_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
@@ -495,10 +511,13 @@ Sections
     <span class="p">}</span>
    
     <span class="n">get_caviar_output</span> <span class="o">=</span> <span class="n">function</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">rds_file</span><span class="p">)</span> <span class="p">{</span>
+  
+      <span class="n">cs_annot</span> <span class="o">=</span> <span class="n">rep</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">))</span>
+      <span class="n">cs_annot</span><span class="p">[</span><span class="n">match</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="nb">set</span><span class="p">,</span> <span class="n">rds_file</span><span class="err">$</span><span class="n">snp</span><span class="err">$</span><span class="n">snp</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span> 
       <span class="n">out</span> <span class="o">=</span> <span class="n">cbind</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="n">rep</span><span class="p">(</span><span class="n">unit</span><span class="p">,</span> <span class="n">length</span><span class="p">(</span><span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">)),</span>
                               <span class="n">rds_file</span><span class="err">$</span><span class="n">var_names</span><span class="p">,</span>
                               <span class="n">rds_file</span><span class="err">$</span><span class="n">snp</span><span class="err">$</span><span class="n">snp_prob</span><span class="p">,</span>
-                              <span class="n">rds_file</span><span class="err">$</span><span class="n">snp</span><span class="err">$</span><span class="n">snp_prob_set</span><span class="p">)</span>
+                              <span class="n">cs_annot</span><span class="p">)</span>
       <span class="n">colnames</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s2">&quot;gene_id&quot;</span><span class="p">,</span> <span class="s2">&quot;var_id&quot;</span><span class="p">,</span> <span class="s2">&quot;pip&quot;</span><span class="p">,</span> <span class="s2">&quot;cs&quot;</span><span class="p">)</span>
       <span class="n">out</span><span class="p">[</span><span class="n">which</span><span class="p">(</span><span class="n">out</span><span class="p">[,</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="err">$</span><span class="p">{</span><span class="n">pip_thresh</span><span class="p">}),</span> <span class="p">]</span>
     <span class="p">}</span>
@@ -685,7 +704,7 @@ Sections
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/5b9b3a0a34c2bf4d0ee7823ab8be668ba6f064b6/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Tue Jan 15 11:26:02 2019 <a href="http://github.com/gaow/fine-mapping/commit/5b9b3a0a34c2bf4d0ee7823ab8be668ba6f064b6">revision 21, 5b9b3a0</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/276da69a6f46548e7a7509acc0118f0bf5fcb710/workflow/finemapping_results_wrangler.ipynb"><code>workflow/finemapping_results_wrangler.ipynb</code></a> committed by Gao Wang on Fri Feb 1 00:37:28 2019 <a href="http://github.com/gaow/fine-mapping/commit/276da69a6f46548e7a7509acc0118f0bf5fcb710">revision 24, 276da69</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

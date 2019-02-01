@@ -315,7 +315,7 @@ devtools::install_github("stephenslab/dsc", subdir = "dscrutils", force = TRUE)<
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>/home/gaow/Documents/GIT/github/fine-mapping</pre>
+<pre>/scratch/midway2/gaow/GIT/github/fine-mapping</pre>
 </div>
 </div>
 
@@ -365,6 +365,7 @@ Workflows:
   susie_z
   dap
   caviar
+  finemap
 
 Global Workflow Options:
   --loci . (as path)
@@ -377,6 +378,8 @@ Global Workflow Options:
                         sample size
   --var-y 0 (as int)
                         variance of phenotype. Set to zero for &#34;unspecified&#34;
+  --job-size 80 (as int)
+                        For cluster jobs, number of loci to analyze per job
 
 Sections
   susie_bhat_1:         Run SuSiE bhat version
@@ -387,7 +390,7 @@ Sections
                         use --pve-is-total to indicate the pve set above is for
                         the entire loci and should be divided over number of
                         variables
-      --[no-]susie-est-residual (default to True)
+      --[no-]susie-est-residual (default to False)
                         Whether or not to estimate residual variance
       --L 5 (as int)
                         Set maximum number of effect variables
@@ -409,7 +412,13 @@ Sections
     Workflow Options:
       --args &#39;&#39;
                         Extra arguments to pass to CAVIAR
-  susie_bhat_2, susie_z_2, dap_2, caviar_2: Summarize Fine-mapping results
+  finemap_1:            Run FINEMAP
+    Workflow Options:
+      --k NULL
+                        K parameter
+      --args &#39;&#39;
+                        Extra arguments to pass to CAVIAR
+  *_2:                  Summarize Fine-mapping results
 </pre>
 </div>
 </div>
@@ -434,6 +443,8 @@ Sections
 <span class="kn">parameter:</span> <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="c1"># variance of phenotype. Set to zero for &quot;unspecified&quot;</span>
 <span class="kn">parameter:</span> <span class="n">var_y</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="c1"># For cluster jobs, number of loci to analyze per job</span>
+<span class="kn">parameter:</span> <span class="n">job_size</span> <span class="o">=</span> <span class="mi">80</span>
 
 <span class="n">fail_if</span><span class="p">(</span><span class="ow">not</span> <span class="n">loci</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specify valid path for --loci&#39;</span><span class="p">)</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="n">ss_data_prefix</span><span class="o">.</span><span class="n">is_file</span><span class="p">(),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;--ss-data-prefix should be a path not a file (usually file without extension, if using input from my data wrangling pipeline)&#39;</span><span class="p">)</span>
@@ -446,15 +457,17 @@ Sections
 <span class="k">def</span> <span class="nf">fmtP</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;p&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
 
-<span class="k">def</span> <span class="nf">is_data_file_empty</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">is_data_file_empty</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">min_row</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">True</span>
     <span class="kn">import</span> <span class="nn">pandas</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">delim_whitespace</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">pandas</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">nrows</span><span class="o">=</span><span class="n">min_row</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">delim_whitespace</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">pandas</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">EmptyDataError</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">True</span>
     <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">True</span>
+    <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">min_row</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">True</span>
     <span class="k">return</span> <span class="bp">False</span>
 </pre></div>
@@ -501,7 +514,7 @@ Sections
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.rds&#39;</span>
 <span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
 
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 
 <span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table(gzfile(&quot;{_input:nn}.{annotation}.gz&quot;))[,2]&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{_input:nn}.{annotation}.gz&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="n">annotation</span> <span class="o">!=</span> <span class="s1">&#39;uniform&#39;</span> <span class="ow">and</span> <span class="n">prior_str</span> <span class="o">==</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Cannot find annotation file for ``{annotation}``. Please use --annotation uniform if you do not want to apply any annotations&quot;</span><span class="p">)</span>
@@ -566,7 +579,7 @@ Sections
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.rds&#39;</span>
 <span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
 
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 
 <span class="n">prior_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;read.table(gzfile(&quot;{_input:nn}.{annotation}.gz&quot;))[,2]&#39;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{_input:nn}.{annotation}.gz&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;NULL&#39;</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="n">annotation</span> <span class="o">!=</span> <span class="s1">&#39;uniform&#39;</span> <span class="ow">and</span> <span class="n">prior_str</span> <span class="o">==</span> <span class="s1">&#39;NULL&#39;</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Cannot find annotation file for ``{annotation}``. Please use --annotation uniform if you do not want to apply any annotations&quot;</span><span class="p">)</span>
@@ -627,7 +640,7 @@ Sections
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{annotation}.{suffix}.pkl&#39;</span>
 <span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
 
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;10m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 <span class="n">prior_file</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;{_input:ann}.{annotation}.gz&quot;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{_input:ann}.{annotation}.gz&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="bp">None</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="n">annotation</span> <span class="o">!=</span> <span class="s1">&#39;uniform&#39;</span> <span class="ow">and</span> <span class="n">prior_file</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;Cannot find annotation file for ``{annotation}``. Please use --annotation uniform if you do not want to apply any annotations&quot;</span><span class="p">)</span>
 
@@ -711,7 +724,7 @@ Sections
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{suffix}.rds&#39;</span>
 <span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
 
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
@@ -796,7 +809,7 @@ Sections
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h2>
+<h3 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -817,9 +830,9 @@ Sections
 <span class="c1">#</span>
 <span class="kn">input:</span> <span class="n">data</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.{suffix}.rds&#39;</span>
-<span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">))</span>
+<span class="n">skip_if</span><span class="p">(</span><span class="n">is_data_file_empty</span><span class="p">(</span><span class="n">_input</span><span class="p">,</span> <span class="n">min_row</span> <span class="o">=</span> <span class="mi">1</span><span class="p">))</span>
 
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;15m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;8G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span>
     <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
@@ -838,7 +851,6 @@ Sections
                 <span class="n">meta</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.master&quot;</span><span class="p">),</span>
                 <span class="n">log</span><span class="o">=</span><span class="n">paste0</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span><span class="s2">&quot;.FINEMAP.log&quot;</span><span class="p">))</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">read</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">gzfile</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">ar</span><span class="p">}),</span> <span class="n">head</span> <span class="o">=</span> <span class="n">F</span><span class="p">,</span> <span class="n">stringsAsFactors</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">)</span>
-   <span class="k">print</span><span class="p">(</span><span class="n">names</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
     <span class="k">if</span> <span class="p">(</span><span class="n">ncol</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span> <span class="p">{</span>
         <span class="k">if</span> <span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
           <span class="n">p_values</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">pt</span><span class="p">(</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">data</span><span class="p">[,</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">data</span><span class="p">[,</span><span class="mi">3</span><span class="p">]),</span> <span class="n">df</span> <span class="o">=</span> <span class="err">$</span><span class="p">{</span><span class="n">n</span><span class="p">}</span> <span class="o">-</span> <span class="mi">2</span><span class="p">)</span>
@@ -938,9 +950,9 @@ Sections
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Summarize Fine-mapping results</span>
 <span class="p">[</span><span class="o">*</span><span class="n">_2</span> <span class="p">(</span><span class="n">plot</span> <span class="n">PIP</span><span class="p">)]</span>
 <span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
-<span class="kn">input:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">output_from</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="p">],</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.pdf&#39;</span>
-<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;2m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;2G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
+
+<span class="kn">task:</span> <span class="kp">trunk_workers</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">trunk_size</span> <span class="o">=</span> <span class="n">job_size</span> <span class="o">*</span> <span class="mi">3</span><span class="p">,</span> <span class="kp">walltime</span> <span class="o">=</span> <span class="s1">&#39;2m&#39;</span><span class="p">,</span> <span class="kp">mem</span> <span class="o">=</span> <span class="s1">&#39;2G&#39;</span><span class="p">,</span> <span class="kp">cores</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="kp">tags</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{step_name}_{_output:bn}&#39;</span>
 
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.log&#39;</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
     <span class="n">s</span> <span class="o">=</span> <span class="n">dscrutils</span><span class="p">::</span><span class="n">read_dsc</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">})</span>
@@ -1763,7 +1775,7 @@ INFO: Workflow caviar (ID=157b4cf09027e3f5) is executed successfully with 2 comp
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h2>
+<h3 id="FINEMAP">FINEMAP<a class="anchor-link" href="#FINEMAP">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -1962,7 +1974,7 @@ INFO: Workflow caviar (ID=157b4cf09027e3f5) is executed successfully with 2 comp
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/55ae0807e3ea1b06355eec4bcb9c5f7a0adbdaba/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Jan 18 14:10:35 2019 <a href="http://github.com/gaow/fine-mapping/commit/55ae0807e3ea1b06355eec4bcb9c5f7a0adbdaba">revision 31, 55ae080</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/276da69a6f46548e7a7509acc0118f0bf5fcb710/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Feb 1 00:37:28 2019 <a href="http://github.com/gaow/fine-mapping/commit/276da69a6f46548e7a7509acc0118f0bf5fcb710">revision 37, 276da69</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

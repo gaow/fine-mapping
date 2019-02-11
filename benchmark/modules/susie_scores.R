@@ -32,3 +32,16 @@ susie_scores = function(sets, pip, true_coef) {
   }
   return(list(total=total, valid=valid, size=size, purity=purity, top=top_hit))
 }
+
+susie_scores_multiple = function(res, truth) {
+  total = valid = size = purity = top = 0
+  for (r in 1:length(res)) {
+    out = susie_scores(res[[r]]$sets, res[[r]]$pip, truth[,r])
+    total = total + out$total
+    valid = valid + out$valid
+    size = size + out$size
+    purity = purity + out$purity
+    top = top + out$top
+  }
+  return(list(total=total, valid=valid, size=size, purity=purity, top=top))
+}

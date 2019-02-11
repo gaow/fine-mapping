@@ -1,9 +1,9 @@
 #!/usr/bin/env dsc
 
-%include modules/data
-%include modules/simulate
-%include modules/fit
-%include modules/evaluate
+%include data
+%include simulate
+%include fit
+%include evaluate
 
 DSC:
   define:

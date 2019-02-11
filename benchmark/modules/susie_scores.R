@@ -35,6 +35,7 @@ susie_scores = function(sets, pip, true_coef) {
 
 susie_scores_multiple = function(res, truth) {
   total = valid = size = purity = top = 0
+  objective = vector()
   for (r in 1:length(res)) {
     out = susie_scores(res[[r]]$sets, res[[r]]$pip, truth[,r])
     total = total + out$total
@@ -42,6 +43,7 @@ susie_scores_multiple = function(res, truth) {
     size = size + out$size
     purity = purity + out$purity
     top = top + out$top
+    objective[r] = susieR::susie_get_objective(res[[r]])
   }
-  return(list(total=total, valid=valid, size=size, purity=purity, top=top))
+  return(list(total=total, valid=valid, size=size, purity=purity, top=top, objective=objective))
 }

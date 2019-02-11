@@ -68,3 +68,11 @@ fit_susie01(fit_susie):
 
 fit_susie10(fit_susie):
   maxL: 15
+
+fit_susie_uniroot(fit_susie):
+  V_method: "uniroot"
+  prior_var: 0
+
+fit_susie_em(fit_susie):
+  V_method: "EM"
+  prior_var: 0

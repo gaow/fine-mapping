@@ -35,7 +35,7 @@ plot_susie: plot_susie.R
   result: $fitted
   $plot_file: file(png)
 
-score_susie: susie_scores.R + R(sc = susie_scores_multiple($(posterior), $(data)$true_coef))
+score_susie: susie_scores.R + R(sc = susie_scores_multiple($(fitted), $(data)$true_coef))
     $total: sc$total
     $valid: sc$valid
     $size: median(sc$size)

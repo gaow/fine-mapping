@@ -1,5 +1,5 @@
 # Modules to evaluate various methods
-# for finemapping-m
+# for finemapping
 
 # Module input
 # ============
@@ -34,3 +34,10 @@ plot_susie: plot_susie.R
   data: $data
   result: $fitted
   $plot_file: file(png)
+
+score_susie: susie_scores.R + R(sc = susie_scores($(result)$sets, $(result)$pip, $(data)$true_coef))
+    $total: sc$total
+    $valid: sc$valid
+    $size: median(sc$size)
+    $purity: median(sc$purity)
+    $top: sc$top

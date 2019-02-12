@@ -65,5 +65,5 @@ susie_scores_multiple = function(res, truth) {
     objective[r] = susieR::susie_get_objective(res[[r]])
     converged[r] = res[[r]]$converged
   }
-  return(list(total=total, valid=valid, size=size, purity=purity, top=top, objective=objective, converged=sum(converged))
+  return(list(total=total, valid=valid, size=size, purity=purity, top=top, objective=objective, converged=sum(converged)))
 }

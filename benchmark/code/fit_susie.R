@@ -15,7 +15,6 @@ for (r in 1:ncol(data$Y)) {
                                estimate_prior_variance=TRUE,
                                null_weight=null_weight,
                                coverage=0.95,min_abs_corr=0.5,
-                               optimV_method = V_method,
                                tol=1e-3)
   } else {
       fitted[[r]] <- susie(data$X,data$Y[,r],

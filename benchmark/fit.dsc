@@ -64,15 +64,14 @@ fit_susie_auto: fit_susie.R
   $fitted: fitted
 
 fit_susie01(fit_susie):
+  null_weight: 0
   maxL: 1
 
 fit_susie10(fit_susie):
   maxL: 15
 
-fit_susie_uniroot(fit_susie):
-  V_method: "uniroot"
-  prior_var: 0
+#------------------------------
+# SuSiE with summary statistics
+#------------------------------
 
-fit_susie_em(fit_susie):
-  V_method: "EM"
-  prior_var: 0
+fit_susie_z: fit_susie_z.R

@@ -41,3 +41,5 @@ score_susie: susie_scores.R + R(sc = susie_scores_multiple($(fitted), $(data)$tr
     $size: median(sc$size)
     $purity: median(sc$purity)
     $top: sc$top
+    $objective: sc$objective
+    $converged: sc$converged

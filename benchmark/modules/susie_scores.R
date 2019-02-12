@@ -1,3 +1,20 @@
+#' @title Check if produced confidence sets are duplicated
+#' @param cs a list a susie confidence sets from susie fit
+#' @return a boolean 1 if duplicated, 0 otherwise
+check_duplicate = function(cs){
+  cs.length = length(cs)
+  if (cs.length == 0){
+    return(0)
+  }else{
+    cs.vec = unlist(cs)
+    if (sum(duplicated(cs.vec)) > 0){
+      return(1)
+    }else{
+      return(0)
+    }
+  }
+}
+
 #' @title Compare SuSiE fits to truth
 #' @param sets a list of susie CS info from susie fit
 #' @param pip probability for p variables
@@ -30,12 +47,13 @@ susie_scores = function(sets, pip, true_coef) {
       if (set.idx[highest.idx]%in%beta_idx) top_hit=top_hit+1
     }
   }
-  return(list(total=total, valid=valid, size=size, purity=purity, top=top_hit))
+  return(list(total=total, valid=valid, size=size, purity=purity, top=top_hit, has_duplicate=check_duplicate(cs)))
 }
 
 susie_scores_multiple = function(res, truth) {
-  total = valid = size = purity = top = 0
+  total = valid = size = purity = top = has_duplicate = 0
   objective = vector()
+  converged = vector()
   for (r in 1:length(res)) {
     out = susie_scores(res[[r]]$sets, res[[r]]$pip, truth[,r])
     total = total + out$total
@@ -43,7 +61,9 @@ susie_scores_multiple = function(res, truth) {
     size = size + out$size
     purity = purity + out$purity
     top = top + out$top
+    has_duplicate = has_duplicate + out$has_duplicate
     objective[r] = susieR::susie_get_objective(res[[r]])
+    converged[r] = res[[r]]$converged
   }
-  return(list(total=total, valid=valid, size=size, purity=purity, top=top, objective=objective))
+  return(list(total=total, valid=valid, size=size, purity=purity, top=top, objective=objective, converged=sum(converged))
 }

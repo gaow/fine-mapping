@@ -5,5 +5,6 @@ docs/workflow.html
 docs/workflow.tpl
 docs/workflow/finemapping_results_wrangler.html
 docs/workflow/finemapping_to_ldsc.pipeline.html
+docs/workflow/gwas_enrichment.html
 docs/workflow/summary_statistics_finemapping.html
 docs/workflow/summary_statistics_wrangler.html

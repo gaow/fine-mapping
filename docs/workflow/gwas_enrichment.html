@@ -1,0 +1,1061 @@
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="ipynb_website:version" content="0.9.7" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<link rel="stylesheet" type="text/css" href="../css/jt.css">
+
+<link rel="stylesheet" type="text/css" href="../css/toc2.css">
+
+<link href="../site_libs/jqueryui-1.11.4/jquery-ui.css">
+<link rel="stylesheet" href="../site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="../site_libs/font-awesome-4.5.0/css/font-awesome.min.css" rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="../site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+
+<link rel="stylesheet"
+      href="../site_libs/highlightjs/null.min.css"
+      type="text/css" />
+
+<script src="../site_libs/highlightjs/highlight.pack.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+<script type="text/javascript">
+if (window.hljs && document.readyState && document.readyState === "complete") {
+   window.setTimeout(function() {
+      hljs.initHighlighting();
+   }, 0);
+}
+</script>
+
+<script src="../js/doc_toc.js"></script>
+<script src="../js/docs.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+<script>
+    MathJax.Hub.Config({
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+        },
+        "HTML-CSS": {
+            preferredFont: "TeX",
+            availableFonts: ["TeX"],
+            styles: {
+                scale: 110,
+                ".MathJax_Display": {
+                    "font-size": "110%",
+                }
+            }
+        }
+    });
+</script>
+<script>
+function filterDataFrame(id) {
+    var input = document.getElementById("search_" + id);
+    var filter = input.value.toUpperCase();
+    var table = document.getElementById("dataframe_" + id);
+    var tr = table.getElementsByTagName("tr");
+    // Loop through all table rows, and hide those who don't match the search query
+    for (var i = 1; i < tr.length; i++) {
+        for (var j = 0; j < tr[i].cells.length; ++j) {
+            var matched = false;
+            if (tr[i].cells[j].innerHTML.toUpperCase().indexOf(filter) != -1) {
+                tr[i].style.display = "";
+                matched = true
+                break;
+            }
+            if (!matched)
+                tr[i].style.display = "none";
+        }
+    }
+}
+function sortDataFrame(id, n, dtype) {
+    var table = document.getElementById("dataframe_" + id);
+    var tb = table.tBodies[0]; // use `<tbody>` to ignore `<thead>` and `<tfoot>` rows
+    var tr = Array.prototype.slice.call(tb.rows, 0); // put rows into array
+    if (dtype === 'numeric') {
+        var fn = function(a, b) { 
+            return parseFloat(a.cells[n].textContent) <= parseFloat(b.cells[n].textContent) ? -1 : 1;
+        }
+    } else {
+        var fn = function(a, b) {
+            var c = a.cells[n].textContent.trim().localeCompare(b.cells[n].textContent.trim()); 
+            return c > 0 ? 1 : (c < 0 ? -1 : 0) }
+    }
+    var isSorted = function(array, fn) {
+        if (array.length < 2)
+            return 1;
+        var direction = fn(array[0], array[1]); 
+        for (var i = 1; i < array.length - 1; ++i) {
+            var d = fn(array[i], array[i+1]);
+            if (d == 0)
+                continue;
+            else if (direction == 0)
+                direction = d;
+            else if (direction != d)
+                return 0;
+            }
+        return direction;
+    }
+    var sorted = isSorted(tr, fn);
+    if (sorted == 1 || sorted == -1) {
+        // if sorted already, reverse it
+        for(var i = tr.length - 1; i >= 0; --i)
+            tb.appendChild(tr[i]); // append each row in order
+    } else {
+        tr = tr.sort(fn);
+        for(var i = 0; i < tr.length; ++i)
+            tb.appendChild(tr[i]); // append each row in order
+    }
+}
+</script>
+
+<script>
+$( document ).ready(function(){
+            var cfg={'threshold':3,     // depth of toc (number of levels)
+             'number_sections': false,
+             'toc_cell': false,          // useless here
+             'toc_window_display': true, // display the toc window
+             "toc_section_display": "block", // display toc contents in the window
+             'sideBar':true,       // sidebar or floating window
+             'navigate_menu':false       // navigation menu (only in liveNotebook -- do not change)
+            }
+            var st={};                  // some variables used in the script
+            st.rendering_toc_cell = false;
+            st.config_loaded = false;
+            st.extension_initialized=false;
+            st.nbcontainer_marginleft = $('#notebook-container').css('margin-left')
+            st.nbcontainer_marginright = $('#notebook-container').css('margin-right')
+            st.nbcontainer_width = $('#notebook-container').css('width')
+            st.oldTocHeight = undefined
+            st.cell_toc = undefined;
+            st.toc_index=0;
+            // fire the main function with these parameters
+            table_of_contents(cfg, st);
+            var file=workflowDict[$("h1:first").attr("id")];
+            $("#toc-level0 a").css("color","#126dce");
+            $('a[href="#'+$("h1:first").attr("id")+'"]').hide()
+            var docs=workflowArray;
+            var docs_map=workflowArrayMap;
+            var pos=workflowArray.indexOf(file);
+            for (var a=pos;a>=0;a--){
+                  $('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>').insertBefore("#toc-level0 li:eq(0)");
+            }
+            $('a[href="'+file+'.html'+'"]').css("color","#126dce");
+            for (var a=pos+1;a<docs.length;a++){
+                  $(".toc #toc-level0").append('<li><a href="'+docs[a]+'.html"><font color="#073642"><b>'+docs_map[docs[a]].replace(/_/g," ")+'</b></font></a></li>');
+            }
+            // $("#toc-header").hide(); // comment out because it prevents search bar from displaying
+    });
+</script>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+  // mark it active
+  menuAnchor.parent().addClass('active');
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+<div class="container-fluid main-container">
+<!-- tabsets -->
+<script src="../site_libs/navigation-1.1/tabsets.js"></script>
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+
+
+<title>fine-mapping</title>
+
+<style type = "text/css">
+body {
+  font-family: "Droid Sans";
+  padding-top: 66px;
+  padding-bottom: 40px;
+}
+</style>
+</head>
+
+<body>
+<div tabindex="-1" id="notebook" class="border-box-sizing">
+<div class="container" id="notebook-container">
+
+<!-- code folding -->
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="../index.html">fine-mapping</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+<li>
+  <a href="../index.html">Overview</a>
+</li>
+        
+<li>
+  <a href="../workflow.html">Workflow</a>
+</li>
+        
+      </ul>
+        
+<ul class="nav navbar-nav navbar-right">
+<li>
+   <a href="http://github.com/gaow/fine-mapping"> <span class="fa fa-github"></span> </a>
+</li>
+</ul>
+        
+      </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Enrichment-analysis-workflows">Enrichment analysis workflows<a class="anchor-link" href="#Enrichment-analysis-workflows">&#182;</a></h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Based on some <code>snakemake</code> pipelines originally authored by Jean. It runs enrichment analysis by <code>torus</code>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">revisions</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+
+        <table class="revision_table">
+        <tr>
+        <th>Revision</th>
+        <th>Author</th>
+        <th>Date</th>
+        <th>Message</th>
+        <tr>
+        <tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/0d15a27dc5af0d4cb4ddf64757bb3e29bd7db356/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">0d15a27<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-12</td>
+<td>deepsea report1</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/8fd252154c519e388bc4c0153acb92fe9eb54e07/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">8fd2521<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-11</td>
+<td>update deepsea, run SCZ Sweden in half instead of all of it together</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/2d05327f8e5ccc4d2ec1e6717e511881c6625d27/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">2d05327<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-10</td>
+<td>update</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/d3da4ea6e14047040e87985ea1536c9b223e0b14/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">d3da4ea<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-09</td>
+<td>update</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/8f58fd5b2c411d98fd9fac2d68fb62f27d12554b/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">8f58fd5<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-05</td>
+<td>SCZ2_49EUR enrichment</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/28614f2e6d26d025b18c0bd982de50f83c240216/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">28614f2<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-04</td>
+<td>update workflow for five cell types</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/ec758771d19fe3f2cf6b9431840938c916a61d6f/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">ec75877<span></a></td>
+<td>Min Qiao</td>
+<td>2018-07-03</td>
+<td>add text at enrichment workflow</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/1d76becaf8006518b97366daef1d583fa3bc0671/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">1d76bec<span></a></td>
+<td>Gao Wang</td>
+<td>2018-07-03</td>
+<td>force remove prior folder</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/216bcc1d4c9280f75c7a293f22cdf1f48c200824/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">216bcc1<span></a></td>
+<td>Gao Wang</td>
+<td>2018-07-03</td>
+<td>Mount input data volume to make it possible to write files</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/7b8b651dfe65bea753732336c7cfa1aca1ccd52b/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">7b8b651<span></a></td>
+<td>Gao Wang</td>
+<td>2018-07-03</td>
+<td>Remove default annotation lists</td></tr></table>
+</div>
+
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="err">!</span><span class="n">sos</span> <span class="n">run</span> <span class="mi">20180615</span><span class="n">_Enrichment_Workflows</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>usage: sos run 20180615_Enrichment_Workflows.ipynb
+               [workflow_name | -t targets] [options] [workflow_options]
+  workflow_name:        Single or combined workflows defined in this script
+  targets:              One or more targets to generate
+  options:              Single-hyphen sos parameters (see &#34;sos run -h&#34; for details)
+  workflow_options:     Double-hyphen workflow-specific parameters
+
+Workflows:
+  zscore2bed
+  get_variants
+  merge_annotations
+  range2var_annotation
+  enrichment
+  deepsea_apply
+
+Global Workflow Options:
+  --deepsea-model  path(f&#39;{cwd}/deepsea/deepsea_ATAC053018.hdf5&#39;)
+
+                        Deepsea model for use with `deepsee_apply`
+  --annotation-dir  f&#39;{cwd}/bed_annotations&#39;
+
+                        Path to directory of annotation files
+  --z-score . (as path)
+                        Path to z-score file
+  --single-annot data/all_annotations.txt (as path)
+                        Path to list of single annotations to use
+  --multi-annot data/all_annotations.txt data/general_annotations.txt data/reduced_annotations.txt (as paths)
+                        Path to lists of multi-annotations to use
+
+Sections
+  zscore2bed_1:         Auxiliary step to get variant in bed format based on
+                        variant ID in z-score file
+    Workflow Options:
+      --in-file . (as path)
+  zscore2bed_2:
+  get_variants:
+  merge_annotations:    Auxiliary step to merge multiple annotations
+    Workflow Options:
+      --out-file . (as path)
+      --data-files  (as paths)
+  range2var_annotation_1: Get variants in data that falls in target region
+  range2var_annotation_2: Make binary annotation file
+  range2var_annotation_3: Obtain multiple annotations per SNP for enrichment
+                        analysis
+  enrichment_1:         Run torus with annotation + z-score file
+  enrichment_2:         Consolidate all torus result into one table
+  deepsea_apply_1:
+    Workflow Options:
+      --variants . (as path)
+  deepsea_apply_2:
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To run the analysis:</p>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb range2var_annotation --z-score ... --single-annot ... --multi-annot ...
+sos run analysis/20180615_Enrichment_Workflows.ipynb enrichment --z-score ... --single-annot ... --multi-annot ...</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Annotation-specification">Annotation specification<a class="anchor-link" href="#Annotation-specification">&#182;</a></h2><h3 id="Binary-annotations-of-interest">Binary annotations of interest<a class="anchor-link" href="#Binary-annotations-of-interest">&#182;</a></h3><p>0/1 binary indicated. For example, a few lines in <code>Coding_UCSC_annotation.torus.tsv.gz</code>.</p>
+
+<pre><code>SNP     Coding_UCSC_d
+9:140192349:G:C    0
+9:140192576:C:T    0
+9:140194020:G:A    0
+9:140194735:G:T    1
+9:140194793:A:G    1
+9:140195019:C:A    1
+
+
+</code></pre>
+<h3 id="Annotation-input">Annotation input<a class="anchor-link" href="#Annotation-input">&#182;</a></h3><p>Annotation files are in <code>bed</code> format (for example: Coding_UCSC.bed).</p>
+
+<pre><code>chr1    69090   70008
+chr1    367658  368597
+chr1    621095  622034
+......
+chr9    141121357       141121553
+chr9    141124188       141124276
+chr9    141134069       141134172
+
+
+</code></pre>
+<p>There are many annotations one can use. For this workflow you should prepare two lists:</p>
+<ul>
+<li>For the ones that you'd like to use for one variable <code>torus</code>, put their file name prefix in <code>data/single_annotations.txt</code></li>
+<li>For the ones that you'd like to use for multi-variable <code>torus</code>, put their file name prefix in <code>data/multi_annotations.txt</code></li>
+</ul>
+<p>If you want to remove one annotation just use <code>#</code> to comment it out in the list files.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">../</span><span class="n">data</span><span class="o">/</span><span class="n">all_annotations</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">> ../data/all_annotations.txt (366 B):</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+
+<div class="output_html rendered_html output_subarea ">
+<div class="sos_hint">15 lines (10 displayed, see --limit)</div>
+</div>
+
+</div>
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Coding_UCSC
+Intron_UCSC
+Promoter_UCSC
+Repressed_Hoffman
+UTR_3_UCSC
+UTR_5_UCSC
+Conserved_LindbladToh
+DHS_peaks_Trynka
+Glut_FDR_0.05
+NPC_FDR_0.05</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="GWAS-z-scores-specification">GWAS z-scores specification<a class="anchor-link" href="#GWAS-z-scores-specification">&#182;</a></h2><h3 id="GWAS-data-of-interest">GWAS data of interest<a class="anchor-link" href="#GWAS-data-of-interest">&#182;</a></h3><p>Since there are only European annotations available in Jean's data, we currently only search for GWAS data for European.</p>
+<p><a href="https://www.med.unc.edu/pgc/results-and-downloads/data-use-agreement-forms/SwedenSCZ_data_download_agreement">SCZ Sweden data</a></p>
+<p><a href="https://www.med.unc.edu/pgc/results-and-downloads/data-use-agreement-forms/PTSD%20EA_data_download_agreement">PTSD European Ancestry</a></p>
+<h3 id="LD-block-files">LD block files<a class="anchor-link" href="#LD-block-files">&#182;</a></h3><p><code>/torus/variants/variants_ld_chunk.bed</code></p>
+<p>The second last column indicates LD chunk. LD chunk blocks depend on chromosome and position.</p>
+
+<pre><code>chr1    693731  693732  1:693731:A:G    rs12238997      chr1    10583   1892607 1       0
+chr1    717587  717588  1:717587:G:A    rs144155419     chr1    10583   1892607 1       0
+chr1    730087  730088  1:730087:T:C    rs148120343     chr1    10583   1892607 1       0
+......
+chr9    141076883       141076884       9:141076883:A:G rs11791858      chr9    139500342       141144796       1010    0
+chr9    141099663       141099664       9:141099663:C:G rs12340415      chr9    139500342       141144796       1010    0
+chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    139500342       141144796       1010    0
+
+
+</code></pre>
+<h3 id="GWAS-input-format">GWAS input format<a class="anchor-link" href="#GWAS-input-format">&#182;</a></h3><p>Example format:</p>
+
+<pre><code>chr:pos:alt:ref    z-score     ld_label
+1:10583:A:G        0.116319    1
+22:51228910:A:G   -0.866894    1703</code></pre>
+<p>All GWAS summary statistics have to be converted to this format in order to use.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
+<span class="n">cwd</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s2">&quot;~/Documents/GWAS_ATAC&quot;</span><span class="p">)</span>
+<span class="n">hg19</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/hg19/hg19.fa&#39;</span><span class="p">)</span>
+<span class="c1"># Deepsea model for use with `deepsee_apply`</span>
+<span class="kn">parameter:</span> <span class="n">deepsea_model</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{cwd}/deepsea/deepsea_ATAC053018.hdf5&#39;</span><span class="p">)</span>
+<span class="c1"># Path to directory of annotation files</span>
+<span class="kn">parameter:</span> <span class="n">annotation_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{cwd}/bed_annotations&#39;</span>
+<span class="c1"># Path to z-score file</span>
+<span class="kn">parameter:</span> <span class="n">z_score</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="c1"># Path to list of single annotations to use</span>
+<span class="kn">parameter:</span> <span class="n">single_annot</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1">#parameter: single_annot = path(&quot;data/all_annotations.txt&quot;)</span>
+<span class="c1"># Path to lists of multi-annotations to use</span>
+<span class="kn">parameter:</span> <span class="n">multi_annot</span> <span class="o">=</span> <span class="n">paths</span><span class="p">()</span> <span class="c1">#parameter: multi_annot = paths([&quot;data/all_annotations.txt&quot;, &quot;data/general_annotations.txt&quot;, &quot;data/reduced_annotations.txt&quot;])</span>
+<span class="kn">try:</span>
+    <span class="n">single_anno</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;{annotation_dir}/{x.split()[0]}.bed&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">single_annot</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)]</span>
+    <span class="n">multi_anno</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">f</span><span class="s1">&#39;{y:bn}&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;{annotation_dir}/{x.split()[0]}.bed&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)])</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">multi_annot</span><span class="p">])</span>
+<span class="k">except</span> <span class="p">(</span><span class="n">FileNotFoundError</span><span class="p">,</span> <span class="n">IsADirectoryError</span><span class="p">):</span>
+    <span class="n">single_anno</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">multi_anno</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+<span class="n">out_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{cwd}/{z_score:bn}&#39;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Utility-steps">Utility steps<a class="anchor-link" href="#Utility-steps">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Convert-variants-from-z-score-file-to-bed-format">Convert variants from z-score file to bed format<a class="anchor-link" href="#Convert-variants-from-z-score-file-to-bed-format">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to get variant in bed format based on variant ID in z-score file</span>
+<span class="p">[</span><span class="n">zscore2bed_1</span><span class="p">]</span>
+<span class="kn">parameter:</span> <span class="n">in_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="kn">input:</span> <span class="n">in_file</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.bed.unsorted&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+    <span class="n">var_file</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">out_file</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+
+    <span class="n">variants</span> <span class="o">&lt;-</span> <span class="n">read_tsv</span><span class="p">(</span><span class="n">var_file</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+    <span class="n">colnames</span><span class="p">(</span><span class="n">variants</span><span class="p">)</span> <span class="o">=</span> <span class="n">c</span><span class="p">(</span><span class="s1">&#39;variant&#39;</span><span class="p">,</span> <span class="s1">&#39;ld&#39;</span><span class="p">,</span> <span class="s1">&#39;zscore&#39;</span><span class="p">)</span>
+    <span class="n">var_info</span> <span class="o">&lt;-</span> <span class="n">str_split</span><span class="p">(</span><span class="n">variants</span><span class="err">$</span><span class="n">variant</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
+    <span class="n">variants</span> <span class="o">&lt;-</span> <span class="n">mutate</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="nb">chr</span> <span class="o">=</span> <span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;chr&quot;</span><span class="p">,</span> <span class="n">sapply</span><span class="p">(</span><span class="n">var_info</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">){</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]})),</span> 
+                                 <span class="n">pos</span> <span class="o">=</span> <span class="n">sapply</span><span class="p">(</span><span class="n">var_info</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">){</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]}))</span> <span class="o">%&gt;%</span>
+                <span class="n">mutate</span><span class="p">(</span><span class="n">start</span> <span class="o">=</span> <span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">pos</span><span class="p">),</span> <span class="n">stop</span><span class="o">=</span><span class="k">as</span><span class="o">.</span><span class="n">numeric</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%&gt;%</span>
+                <span class="n">select</span><span class="p">(</span><span class="nb">chr</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">variant</span><span class="p">)</span>
+    <span class="n">options</span><span class="p">(</span><span class="n">scipen</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span> <span class="c1"># So that positions are always fully written out)</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="p">[</span><span class="n">zscore2bed_2</span><span class="p">]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
+     <span class="n">sort</span><span class="o">-</span><span class="n">bed</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+
+<span class="p">[</span><span class="n">get_variants</span><span class="p">:</span> <span class="kp">provides</span> <span class="o">=</span> <span class="s1">&#39;{data}.bed&#39;</span><span class="p">]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{data}.bed&#39;</span>
+<span class="n">sos_run</span><span class="p">(</span><span class="s1">&#39;zscore2bed&#39;</span><span class="p">,</span> <span class="n">in_file</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.gz&#39;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Merge-annotations-for-joint-torus-analysis">Merge annotations for joint torus analysis<a class="anchor-link" href="#Merge-annotations-for-joint-torus-analysis">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to merge multiple annotations</span>
+<span class="p">[</span><span class="n">merge_annotations</span><span class="p">]</span>
+<span class="kn">parameter:</span> <span class="n">out_file</span><span class="o">=</span><span class="n">path</span><span class="p">()</span>
+<span class="kn">parameter:</span> <span class="n">data_files</span><span class="o">=</span><span class="n">paths</span><span class="p">()</span>
+<span class="kn">input:</span> <span class="n">data_files</span>
+<span class="kn">output:</span> <span class="n">out_file</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+
+    <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+
+    <span class="n">out_name</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">annots</span> <span class="o">&lt;-</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">,})</span>
+    <span class="n">var_annot</span> <span class="o">&lt;-</span> <span class="n">read_tsv</span><span class="p">(</span><span class="n">annots</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">col_names</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span> <span class="ow">in</span> <span class="mi">2</span><span class="p">:</span><span class="n">length</span><span class="p">(</span><span class="n">annots</span><span class="p">)){</span>
+        <span class="n">var_annot2</span> <span class="o">&lt;-</span> <span class="n">read_tsv</span><span class="p">(</span><span class="n">annots</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">col_names</span><span class="o">=</span><span class="n">T</span><span class="p">)</span>
+        <span class="n">stopifnot</span><span class="p">(</span><span class="nb">all</span><span class="p">(</span><span class="n">var_annot</span><span class="err">$</span><span class="n">SNP</span> <span class="o">==</span> <span class="n">var_annot2</span><span class="err">$</span><span class="n">SNP</span><span class="p">))</span>
+        <span class="n">var_annot</span> <span class="o">&lt;-</span> <span class="n">cbind</span><span class="p">(</span><span class="n">var_annot</span><span class="p">,</span> <span class="n">var_annot2</span><span class="p">[,</span><span class="mi">2</span><span class="p">])</span>
+    <span class="p">}</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">var_annot</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">gzfile</span><span class="p">(</span><span class="n">out_name</span><span class="p">),</span>
+                <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Prepare-torus-format-binary-annotations">Prepare <code>torus</code> format binary annotations<a class="anchor-link" href="#Prepare-torus-format-binary-annotations">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Get variants in data that falls in target region</span>
+<span class="p">[</span><span class="n">range2var_annotation_1</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">f</span><span class="s1">&#39;{z_score:n}.bed&#39;</span>
+<span class="kn">input:</span> <span class="nb">set</span><span class="p">(</span><span class="n">paths</span><span class="p">(</span><span class="n">single_anno</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">multi_anno</span><span class="o">.</span><span class="n">values</span><span class="p">()))),</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{_input:bn}.{z_score:bn}.bed&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
+    <span class="n">bedops</span> <span class="o">-</span><span class="n">e</span> <span class="p">{</span><span class="n">z_score</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="o">.</span><span class="n">bed</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Make binary annotation file</span>
+<span class="p">[</span><span class="n">range2var_annotation_2</span><span class="p">]</span>
+<span class="kn">parameter:</span> <span class="n">discrete</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">depends:</span> <span class="n">z_score</span>
+<span class="kn">input:</span> 
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.gz&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+
+    <span class="n">variant_tsv</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">z_score</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">annotation_var_bed</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">annot_name</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">bnr</span><span class="p">}</span> <span class="o">%&gt;%</span> <span class="n">str_replace</span><span class="p">(</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span><span class="err">$</span><span class="p">{</span><span class="n">z_score</span><span class="p">:</span><span class="n">bnr</span><span class="p">}),</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">out_name</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+
+    <span class="nb">vars</span> <span class="o">&lt;-</span> <span class="n">read_tsv</span><span class="p">(</span><span class="n">variant_tsv</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)[,</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">annot_vars</span> <span class="o">=</span> <span class="n">read_tsv</span><span class="p">(</span><span class="n">annotation_var_bed</span><span class="p">,</span> <span class="n">col_names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+    <span class="n">names</span><span class="p">(</span><span class="nb">vars</span><span class="p">)</span> <span class="o">&lt;-</span> <span class="s2">&quot;SNP&quot;</span>
+    <span class="nb">vars</span> <span class="o">&lt;-</span> <span class="nb">vars</span> <span class="o">%&gt;%</span>
+            <span class="n">mutate</span><span class="p">(</span><span class="n">annot_d</span> <span class="o">=</span> <span class="n">case_when</span><span class="p">(</span><span class="n">SNP</span> <span class="o">%</span><span class="ow">in</span><span class="o">%</span> <span class="n">annot_vars</span><span class="err">$</span><span class="n">X4</span> <span class="o">~</span> <span class="mi">1</span><span class="p">,</span>
+                                                        <span class="n">TRUE</span> <span class="o">~</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">names</span><span class="p">(</span><span class="nb">vars</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">paste0</span><span class="p">(</span><span class="n">annot_name</span><span class="p">,</span> <span class="s1">&#39;${&quot;_d&quot; if discrete else &quot;_c&quot;}&#39;</span><span class="p">)</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="nb">vars</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">gzfile</span><span class="p">(</span><span class="n">out_name</span><span class="p">),</span>
+                <span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">TRUE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Obtain multiple annotations per SNP for enrichment analysis</span>
+<span class="p">[</span><span class="n">range2var_annotation_3</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">multi_anno</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">sos_run</span><span class="p">(</span><span class="s1">&#39;merge_annotations&#39;</span><span class="p">,</span> <span class="n">out_file</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{k}.{z_score:bn}.gz&#39;</span><span class="p">,</span> <span class="n">data_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{out_dir}/{v:bn}.{z_score:bn}.gz&#39;</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">(</span><span class="n">value</span><span class="p">)])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Enrichment-analysis-via-torus">Enrichment analysis via <code>torus</code><a class="anchor-link" href="#Enrichment-analysis-via-torus">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Run torus with annotation + z-score file</span>
+<span class="p">[</span><span class="n">enrichment_1</span> <span class="p">(</span><span class="n">run</span> <span class="n">torus</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">z_score</span>
+<span class="kn">parameter:</span> <span class="n">gmap</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{cwd}/gene_map/gmap.gz&quot;</span><span class="p">)</span> 
+<span class="n">input_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{out_dir}/{value:bn}.{z_score:bn}.gz&#39;</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">(</span><span class="n">single_anno</span><span class="p">)]</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{out_dir}/{k}.{z_score:bn}.gz&#39;</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">multi_anno</span><span class="p">]</span>
+<span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No annotations to use! Please use ``--single-annot`` and ``--multi-annot`` to pass annotation lists&quot;</span><span class="p">)</span>
+<span class="kn">input:</span> <span class="n">input_files</span><span class="p">,</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.torus&#39;</span>
+
+<span class="kn">bash:</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stderr&#39;</span>
+    <span class="n">rm</span> <span class="o">-</span><span class="n">rf</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="n">_prior</span> 
+    <span class="n">torus</span> <span class="o">-</span><span class="n">d</span> <span class="p">{</span><span class="n">z_score</span><span class="p">}</span> <span class="o">-</span><span class="n">smap</span> <span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">d</span><span class="p">}</span><span class="o">/</span><span class="n">smap</span><span class="o">.</span><span class="n">gz</span> <span class="o">-</span><span class="n">gmap</span> <span class="p">{</span><span class="n">gmap</span><span class="p">}</span> <span class="o">-</span><span class="n">annot</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">-</span><span class="n">est</span> <span class="o">--</span><span class="n">load_zval</span> <span class="o">-</span><span class="n">dump_prior</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="n">_prior</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate all torus result into one table</span>
+<span class="p">[</span><span class="n">enrichment_2</span> <span class="p">(</span><span class="n">make</span> <span class="n">output</span> <span class="n">table</span><span class="p">)]</span>
+<span class="kn">input:</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{z_score:bn}.torus.merged.gz&#39;</span>
+<span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">dplyr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
+    <span class="n">library</span><span class="p">(</span><span class="n">stringr</span><span class="p">)</span>
+    <span class="n">output_file</span> <span class="o">&lt;-</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">names</span> <span class="o">&lt;-</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">bnr</span><span class="p">,})</span>
+    <span class="n">file_names</span> <span class="o">&lt;-</span> <span class="n">c</span><span class="p">(</span><span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">,})</span>
+    <span class="n">tab</span> <span class="o">&lt;-</span> <span class="n">data</span><span class="o">.</span><span class="n">frame</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="o">=</span><span class="n">names</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">&lt;-</span> <span class="n">lapply</span><span class="p">(</span><span class="n">file_names</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">f</span><span class="p">){</span>
+                    <span class="n">lns</span> <span class="o">&lt;-</span> <span class="n">read_lines</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+                    <span class="n">x</span> <span class="o">&lt;-</span> <span class="n">unlist</span><span class="p">(</span><span class="n">str_split</span><span class="p">(</span><span class="n">lns</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s2">&quot; &quot;</span><span class="p">))</span>
+                    <span class="n">x</span> <span class="o">&lt;-</span> <span class="n">x</span><span class="p">[</span><span class="n">str_length</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+                    <span class="n">x</span><span class="p">})</span>
+
+    <span class="n">tab</span><span class="p">[,</span><span class="s2">&quot;log odds ratio&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">sapply</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">){</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]})</span>
+    <span class="n">tab</span><span class="p">[,</span><span class="s2">&quot;95</span><span class="si">% c</span><span class="s2">i&quot;</span><span class="p">]</span> <span class="o">&lt;-</span> <span class="n">sapply</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">function</span><span class="p">(</span><span class="n">x</span><span class="p">){</span><span class="n">paste0</span><span class="p">(</span><span class="s2">&quot;(&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="s2">&quot;, &quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">4</span><span class="p">],</span> <span class="s2">&quot;)&quot;</span><span class="p">)})</span>
+    <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">tab</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">gzfile</span><span class="p">(</span><span class="n">output_file</span><span class="p">),</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">TRUE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Apply-pre-trained-deepsea-model-to-variants">Apply pre-trained <code>deepsea</code> model to variants<a class="anchor-link" href="#Apply-pre-trained-deepsea-model-to-variants">&#182;</a></h2><p>Credits to Yanyu Liang. Required inputs are:</p>
+<ul>
+<li>Path to hg19 reference genome</li>
+<li>Path to model HDF5 file</li>
+<li>Path to list of variants, in the format of:</li>
+</ul>
+
+<pre><code>chr1    68090   68091   G   T
+chr1    68090   68091   G   A
+chr1    68090   68091   G   C
+chr1    68091   68092   C   G
+chr1    68091   68092   C   T
+chr1    68091   68092   C   A
+chr1    68092   68093   T   A
+chr1    68092   68093   T   C
+chr1    68092   68093   T   G
+chr1    68093   68094   A   C</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To run this workflow:</p>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants /path/to/variant/list.file</code></pre>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/scz.swe.var.txt</code></pre>
+<p>It requires much memory. So we test for first 10K line of variant and it worked.</p>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test.var.txt
+sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test100K.var.txt</code></pre>
+<p>Break 9898079 snps into two halves and run deepsea separately.</p>
+
+<pre><code>less scz.swe.var.txt | head -4949039 | gzip &gt; half1.var.txt</code></pre>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half1.var.txt
+sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half2.var.txt</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">deepsea_apply_1</span> <span class="p">(</span><span class="n">prepare</span> <span class="n">config</span> <span class="nb">file</span><span class="p">)]</span>
+<span class="kn">parameter:</span> <span class="n">variants</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="kn">input:</span> <span class="n">variants</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.config&#39;</span>
+<span class="kn">report:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">output</span> <span class="o">=</span> <span class="n">_output</span>
+    <span class="n">var_list</span><span class="p">:</span> <span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">r</span><span class="p">}</span>
+    <span class="n">pred_model</span><span class="p">:</span>
+      <span class="n">path</span><span class="p">:</span> <span class="s1">&#39;{deepsea_model}&#39;</span>
+      <span class="n">label</span><span class="p">:</span>
+        <span class="n">CN</span><span class="p">:</span> <span class="mi">1</span>
+        <span class="n">DN</span><span class="p">:</span> <span class="mi">2</span>
+        <span class="n">GA</span><span class="p">:</span> <span class="mi">3</span>
+        <span class="n">ips</span><span class="p">:</span> <span class="mi">4</span>
+        <span class="n">NSC</span><span class="p">:</span> <span class="mi">5</span>
+    <span class="n">reference_genome</span><span class="p">:</span> <span class="s1">&#39;{hg19}&#39;</span>
+    <span class="n">script_dir</span><span class="p">:</span> <span class="s1">&#39;/opt/deepann&#39;</span>
+    <span class="n">out_dir</span><span class="p">:</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">dr</span><span class="p">}</span>
+    <span class="n">out_prefix</span><span class="p">:</span> <span class="s1">&#39;{_output:bn}_deepsea&#39;</span>
+
+    <span class="c1">##### some default setup #####</span>
+    <span class="c1">#### usually don&#39;t change ####</span>
+    <span class="n">check_allele</span><span class="p">:</span> <span class="bp">False</span>
+    <span class="n">design</span><span class="p">:</span> <span class="s1">&#39;499-1-500&#39;</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">deepsea_apply_2</span> <span class="p">(</span><span class="nb">apply</span> <span class="n">deepsea</span> <span class="n">weights</span><span class="p">)]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.deepsea.list&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/deepann&#39;</span><span class="p">,</span> <span class="n">volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{hg19:d}:{hg19:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{deepsea_model:d}:{deepsea_model:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{os.path.expanduser(&quot;~&quot;)}:/home/$USER&#39;</span><span class="p">],</span> <span class="n">extra_args</span> <span class="o">=</span> <span class="s2">&quot;-e HOME=/home/$USER -e USER=$USER&quot;</span>
+    <span class="n">snakemake</span> <span class="o">--</span><span class="n">snakefile</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">deepann</span><span class="o">/</span><span class="n">Snakefile</span> <span class="o">--</span><span class="n">configfile</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">ls</span> <span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="n">_deepsea</span><span class="o">/</span><span class="n">output__</span><span class="o">*.</span><span class="n">gz</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Enrichment-analysis-via-GREGOR">Enrichment analysis via GREGOR<a class="anchor-link" href="#Enrichment-analysis-via-GREGOR">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>To properly perform enrichment analysis we want to match the control SNPs with the SNPs of interest -- that is, SNPs inside CS -- in terms of LD, distance to nearest gene and MAF. The <a href="http://csg.sph.umich.edu/GREGOR/index.php/site/download">GREGOR</a> software can generate list of matched SNPs. I will use SNPs inside CS as input and expect a list of output SNPs matching these inputs.</p>
+<p>GREGOR is release under University of Michigan license so I'll not make it into a docker image. So path to GREGOR directory is required. Also we need reference files, prepared by:</p>
+
+<pre><code>cat \
+    GREGOR.AFR.ref.r2.greater.than.0.7.tar.gz.part.00 \
+    GREGOR.AFR.ref.r2.greater.than.0.7.tar.gz.part.01 \
+    &gt; GREGOR.AFR.ref.r2.greater.than.0.7.tar.gz
+tar zxvf GREGOR.AFR.ref.r2.greater.than.0.7.tar.gz</code></pre>
+<p>MD5SUM check:</p>
+
+<pre><code>AFR.part.0  ( MD5: 9926904128dd58d6bf1ad4f1e90638af )
+AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
+<p>Same for EUR data-set.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="To-run-GREGOR">To run GREGOR<a class="anchor-link" href="#To-run-GREGOR">&#182;</a></h4><p><code>PGC3</code></p>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/scz2_zscore/gregor.scz2.txt.gz --single-annot data/gregor.txt</code></pre>
+<p><code>PGC2</code></p>
+
+<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/pgc2_zscore/gregor.pgc2.txt.gz --single-annot data/gregor.txt</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">gregor_1</span> <span class="p">(</span><span class="n">make</span> <span class="n">SNP</span> <span class="n">index</span><span class="p">)]</span>
+<span class="kn">parameter:</span> <span class="n">gregor_input</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="kn">input:</span> <span class="n">gregor_input</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.rsid.txt&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.annotations.list&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span>
+    <span class="n">zcat</span> <span class="err">$</span><span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">|</span> <span class="n">cut</span> <span class="o">-</span><span class="n">f</span> <span class="mi">2</span><span class="p">,</span><span class="mi">3</span> <span class="o">-</span><span class="n">d</span> <span class="s2">&quot;_&quot;</span> <span class="o">|</span> <span class="n">sed</span> <span class="s1">&#39;s/_/:/g&#39;</span> <span class="o">&gt;</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_output</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">single_anno</span><span class="p">))</span>
+
+<span class="p">[</span><span class="n">gregor_2</span> <span class="p">(</span><span class="n">make</span> <span class="n">configuration</span> <span class="nb">file</span><span class="p">)]</span>
+<span class="kn">parameter:</span> <span class="n">gregor_db</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/hg19/GREGOR_DB&#39;</span><span class="p">)</span>
+<span class="kn">parameter:</span> <span class="n">pop</span> <span class="o">=</span> <span class="s1">&#39;EUR&#39;</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input[0]:nn}.gregor.conf&#39;</span>
+<span class="kn">report:</span> <span class="n">output</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output}&#39;</span><span class="p">,</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="c1">##############################################################################</span>
+    <span class="c1"># CHIPSEQ ENRICHMENT CONFIGURATION FILE</span>
+    <span class="c1"># This configuration file contains run-time configuration of</span>
+    <span class="c1"># CHIP_SEQ ENRICHMENT</span>
+    <span class="c1">###############################################################################</span>
+    <span class="c1">## KEY ELEMENTS TO CONFIGURE : NEED TO MODIFY</span>
+    <span class="c1">###############################################################################</span>
+    <span class="n">INDEX_SNP_FILE</span> <span class="o">=</span> <span class="p">{</span><span class="n">_input</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span>
+    <span class="n">BED_FILE_INDEX</span> <span class="o">=</span> <span class="p">{</span><span class="n">_input</span><span class="p">[</span><span class="mi">1</span><span class="p">]}</span> 
+    <span class="n">REF_DIR</span> <span class="o">=</span> <span class="p">{</span><span class="n">gregor_db</span><span class="p">}</span>
+    <span class="n">R2THRESHOLD</span> <span class="o">=</span> <span class="mf">0.7</span> <span class="c1">## must be greater than 0.7</span>
+    <span class="n">LDWINDOWSIZE</span> <span class="o">=</span> <span class="mi">10000</span> <span class="c1">## must be less than 1MB; these two values define LD buddies</span>
+    <span class="n">OUT_DIR</span> <span class="o">=</span> <span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">nn</span><span class="p">}</span><span class="n">_gregor_output</span>
+    <span class="n">MIN_NEIGHBOR_NUM</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1">## define the size of neighborhood</span>
+    <span class="n">BEDFILE_IS_SORTED</span> <span class="o">=</span> <span class="n">true</span>  <span class="c1">## false, if the bed files are not sorted</span>
+    <span class="n">POPULATION</span> <span class="o">=</span> <span class="p">{</span><span class="n">pop</span><span class="p">}</span>  <span class="c1">## define the population, you can specify EUR, AFR, AMR or ASN</span>
+    <span class="n">TOPNBEDFILES</span> <span class="o">=</span> <span class="mi">2</span> 
+    <span class="n">JOBNUMBER</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="c1">###############################################################################</span>
+    <span class="c1">#BATCHTYPE = mosix ##  submit jobs on MOSIX</span>
+    <span class="c1">#BATCHOPTS = -E/tmp -i -m2000 -j10,11,12,13,14,15,16,17,18,19,120,122,123,124,125 sh -c</span>
+    <span class="c1">###############################################################################</span>
+    <span class="c1">#BATCHTYPE = slurm   ##  submit jobs on SLURM</span>
+    <span class="c1">#BATCHOPTS = --partition=broadwl --account=pi-mstephens --time=0:30:0</span>
+    <span class="c1">###############################################################################</span>
+    <span class="n">BATCHTYPE</span> <span class="o">=</span> <span class="n">local</span> <span class="c1">##  run jobs on local machine</span>
+
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">sed</span> <span class="o">-</span><span class="n">i</span> <span class="s1">&#39;/^$/d&#39;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>GREGOR is written in <code>perl</code>. Some libraries are required before one can run GREGOR:</p>
+
+<pre><code>sudo apt-get install libdbi-perl libswitch-perl libdbd-sqlite3-perl</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">gregor_3</span> <span class="p">(</span><span class="n">run</span> <span class="n">gregor</span><span class="p">)]</span>
+<span class="kn">parameter:</span> <span class="n">gregor_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/GREGOR&#39;</span><span class="p">)</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}_gregor_output/StatisticSummaryFile.txt&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">perl</span> <span class="p">{</span><span class="n">gregor_path</span><span class="p">}</span><span class="o">/</span><span class="n">script</span><span class="o">/</span><span class="n">GREGOR</span><span class="o">.</span><span class="n">pl</span> <span class="o">--</span><span class="n">conf</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">touch</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+
+<span class="p">[</span><span class="n">gregor_4</span> <span class="p">(</span><span class="n">format</span> <span class="n">output</span><span class="p">)]</span>
+<span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.csv&#39;</span>
+<span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">sed</span> <span class="s1">&#39;s/</span><span class="se">\t</span><span class="s1">/,/g&#39;</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<hr>
+Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/8200a370c7292ff6830a9b60e6b41341846b09d1/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Sun Jul 7 09:31:12 2019 <a href="http://github.com/gaow/fine-mapping/commit/8200a370c7292ff6830a9b60e6b41341846b09d1">revision 1, 8200a37</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+</div>
+</div>
+</body>
+</html>

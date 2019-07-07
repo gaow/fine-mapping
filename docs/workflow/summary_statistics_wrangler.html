@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="ipynb_website:version" content="0.9.6" />
+<meta name="ipynb_website:version" content="0.9.7" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <link rel="stylesheet" type="text/css" href="../css/jt.css">
@@ -307,7 +307,7 @@ A popular choice is <a href="http://hgdownload.cse.ucsc.edu/gbdb/hg19/1000Genome
 2 ALL.chr2.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.EUR.vcf.gz
 ...</code></pre>
 <p>where each line is white-space separated with the first the chromosome number and second the file name.</p>
-<p><strong>For UChicago midway users</strong>: reference genotype data for 1000 Genomes EUR samples are extracted using workflow <code>prepare_1KG_reference</code> below. The output can be found under <code>/project/mstephens/SuSIE_gtex_CPP/1KG_EUR</code>. The manifest file <code>1KG_EUR.manifest</code> was prepared by:</p>
+<p><strong>For UChicago midway users</strong>: reference genotype data for 1000 Genomes EUR samples are extracted using workflow <code>prepare_1KG_reference</code> below. The output can be found under <code>/project2/xinhe/mqiao/SuSiE_GWAS/1KG_EUR/</code>. The manifest file <code>1KG_EUR.manifest</code> was prepared by:</p>
 
 <pre><code>for i in {1..22} X; do echo $i ALL.chr$i.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.EUR.vcf.gz; done &gt; 1KG_EUR.manifest</code></pre>
 </li>
@@ -673,6 +673,7 @@ Sections
 <span class="kn">parameter:</span> <span class="n">adjust_panel_position</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="c1"># Either empty, or `chr`</span>
 <span class="kn">parameter:</span> <span class="n">panel_chrom_prefix</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
 
 <span class="n">fail_if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">),</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Input column ID has to be of length 5 or 6.&#39;</span><span class="p">)</span>
 
@@ -1465,7 +1466,7 @@ total A/T and C/G removed:0</pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/276da69a6f46548e7a7509acc0118f0bf5fcb710/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by Gao Wang on Fri Feb 1 00:37:28 2019 <a href="http://github.com/gaow/fine-mapping/commit/276da69a6f46548e7a7509acc0118f0bf5fcb710">revision 35, 276da69</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/69d4049451c3fe11694d6fcd6d965cae9e89c041/workflow/summary_statistics_wrangler.ipynb"><code>workflow/summary_statistics_wrangler.ipynb</code></a> committed by minqiao on Mon Jul 1 18:51:56 2019 <a href="http://github.com/gaow/fine-mapping/commit/69d4049451c3fe11694d6fcd6d965cae9e89c041">revision 36, 69d4049</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

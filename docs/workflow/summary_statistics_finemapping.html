@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="ipynb_website:version" content="0.9.6" />
+<meta name="ipynb_website:version" content="0.9.7" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <link rel="stylesheet" type="text/css" href="../css/jt.css">
@@ -506,6 +506,7 @@ Sections
 <span class="c1"># Whether or not to keep fit from each iteration,</span>
 <span class="c1"># for debug purpose.</span>
 <span class="kn">parameter:</span> <span class="n">track_fit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="c1">#</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_B.L_{L}.prior_{fmtP(susie_pve)}.res_var_{str(susie_est_residual).lower()}&#39;</span>
 <span class="n">var_y_str</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;var_y = {var_y},&#39;</span> <span class="k">if</span> <span class="n">var_y</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
@@ -572,6 +573,7 @@ Sections
 <span class="c1"># Whether or not to keep fit from each iteration,</span>
 <span class="c1"># for debug purpose.</span>
 <span class="kn">parameter:</span> <span class="n">track_fit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="c1">#</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;SuSiE_Z.L_{L}&#39;</span>
 <span class="c1">#</span>
@@ -633,6 +635,7 @@ Sections
 <span class="n">fail_if</span><span class="p">(</span><span class="n">n</span><span class="o">&lt;=</span><span class="mi">2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Please specif valid sample size --n&#39;</span><span class="p">)</span>
 <span class="c1"># Extra arguments to pass to DAP</span>
 <span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;DAP{&quot;.&quot;+fmtP(args) if len(args) else &quot;&quot;}&#39;</span>
 <span class="c1">#</span>
 <span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;dap-g&#39;</span><span class="p">),</span> <span class="n">Py_Module</span><span class="p">(</span><span class="s1">&#39;pandas&#39;</span><span class="p">),</span> <span class="n">Py_Module</span><span class="p">(</span><span class="s1">&#39;numpy&#39;</span><span class="p">)</span>
@@ -794,7 +797,7 @@ Sections
       <span class="k">return</span><span class="p">(</span><span class="n">snp</span><span class="p">)</span>    
     <span class="p">}</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="n">run_caviar</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;${args}&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">run_caviar</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">args</span><span class="p">})</span>
     <span class="n">res</span><span class="err">$</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_scores</span>
     <span class="n">res</span><span class="err">$</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">saveRDS</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">ar</span><span class="p">})</span>
@@ -823,7 +826,8 @@ Sections
 <span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;finemap&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;magrittr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dscrutils&#39;</span><span class="p">)</span> <span class="c1"># can be installed via `devtools::install_github(&quot;stephenslab/dsc&quot;,subdir = &quot;dscrutils&quot;, force = TRUE)`</span>
 <span class="c1"># K parameter</span>
 <span class="kn">parameter:</span> <span class="n">k</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
-<span class="c1"># Extra arguments to pass to CAVIAR</span>
+<span class="c1"># Extra arguments to pass to FINEMAP</span>
+<span class="c1"># eg, `--args &quot;&#39;--n-causal-max 3&#39;&quot;`</span>
 <span class="kn">parameter:</span> <span class="n">args</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 <span class="n">suffix</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;FINEMAP{&quot;.&quot;+fmtP(args) if len(args) else &quot;&quot;}&#39;</span>
 <span class="n">fail_if</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Sample size is invalid. Please set it properly via --n.&#39;</span><span class="p">)</span>
@@ -923,7 +927,7 @@ Sections
       <span class="k">return</span><span class="p">(</span><span class="n">tab</span><span class="p">)</span>
     <span class="p">}</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="n">run_finemap</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="s2">&quot;${args}&quot;</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">run_finemap</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">args</span><span class="p">})</span>
     <span class="n">res</span><span class="err">$</span><span class="n">z</span> <span class="o">=</span> <span class="n">z_scores</span>
     <span class="n">res</span><span class="err">$</span><span class="n">var_names</span> <span class="o">=</span> <span class="n">data</span><span class="p">[,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">saveRDS</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="err">$</span><span class="p">{</span><span class="n">_output</span><span class="p">:</span><span class="n">ar</span><span class="p">})</span>
@@ -1974,7 +1978,7 @@ INFO: Workflow caviar (ID=157b4cf09027e3f5) is executed successfully with 2 comp
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/276da69a6f46548e7a7509acc0118f0bf5fcb710/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by Gao Wang on Fri Feb 1 00:37:28 2019 <a href="http://github.com/gaow/fine-mapping/commit/276da69a6f46548e7a7509acc0118f0bf5fcb710">revision 37, 276da69</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/69d4049451c3fe11694d6fcd6d965cae9e89c041/workflow/summary_statistics_finemapping.ipynb"><code>workflow/summary_statistics_finemapping.ipynb</code></a> committed by minqiao on Mon Jul 1 18:51:56 2019 <a href="http://github.com/gaow/fine-mapping/commit/69d4049451c3fe11694d6fcd6d965cae9e89c041">revision 42, 69d4049</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

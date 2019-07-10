@@ -273,10 +273,25 @@ body {
         <th>Date</th>
         <th>Message</th>
         <tr>
-        <tr><td><a target="_blank" href="git@github.com:gaow/fine-mapping/blob/4e3cda48d32cd317d5c62ae037051e5f4f8c2659/workflow/gwas_enrichment.ipynb"><span class="revision_id">4e3cda4<span></a></td>
+        <tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/43ca235bea1d3023cdcc95fdc1bdd363ddc7bd03/workflow/gwas_enrichment.ipynb"><span class="revision_id">43ca235<span></a></td>
+<td>Min Qiao</td>
+<td>2019-07-09</td>
+<td>update directories info</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/53345f3b6756d4157dba4460d4beaf598267eaaa/workflow/gwas_enrichment.ipynb"><span class="revision_id">53345f3<span></a></td>
+<td>Min Qiao</td>
+<td>2019-07-09</td>
+<td>remove unnecessary depends</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/b6dec46c2cd290dd7879fc039cc40b0873416e0b/workflow/gwas_enrichment.ipynb"><span class="revision_id">b6dec46<span></a></td>
+<td>Gao Wang</td>
+<td>2019-07-09</td>
+<td>Replace torus instruction with docker installation</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/f7760f4eca1a28489277b354f223770e63b0cc31/workflow/gwas_enrichment.ipynb"><span class="revision_id">f7760f4<span></a></td>
+<td>Gao Wang</td>
+<td>2019-07-09</td>
+<td>Update torus installation instruction</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/98406696c934aa8362ae315fc4df94502f9af959/workflow/gwas_enrichment.ipynb"><span class="revision_id">9840669<span></a></td>
+<td>Gao Wang</td>
+<td>2019-07-09</td>
+<td>Build website</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/4e3cda48d32cd317d5c62ae037051e5f4f8c2659/workflow/gwas_enrichment.ipynb"><span class="revision_id">4e3cda4<span></a></td>
 <td>minqiao</td>
 <td>2019-07-09</td>
-<td>update pipeline</td></tr><tr><td><a target="_blank" href="git@github.com:gaow/fine-mapping/blob/8200a370c7292ff6830a9b60e6b41341846b09d1/workflow/gwas_enrichment.ipynb"><span class="revision_id">8200a37<span></a></td>
+<td>update pipeline</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/fine-mapping/blob/8200a370c7292ff6830a9b60e6b41341846b09d1/workflow/gwas_enrichment.ipynb"><span class="revision_id">8200a37<span></a></td>
 <td>Gao Wang</td>
 <td>2019-07-07</td>
 <td>Add enrichment workflow</td></tr></table>
@@ -293,7 +308,7 @@ body {
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="err">!</span><span class="n">sos</span> <span class="n">run</span> <span class="n">gwas_enrichment</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="n">sos</span> <span class="n">run</span> <span class="n">gwas_enrichment</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
 </pre></div>
 
 </div>
@@ -327,17 +342,19 @@ Workflows:
   gregor
 
 Global Workflow Options:
-  --deepsea-model  path(f&#39;{cwd}/deepsea/deepsea_ATAC053018.hdf5&#39;)
-
+  --cwd . (as path)
+                        working directory
+  --hg19 . (as path)
+                        hg19 path
+  --deepsea-model . (as path)
                         Deepsea model for use with `deepsee_apply`
-  --annotation-dir  f&#39;{cwd}/bed_annotations&#39;
-
+  --annotation-dir . (as path)
                         Path to directory of annotation files
   --z-score . (as path)
                         Path to z-score file
   --single-annot . (as path)
                         Path to list of single annotations to use
-  --multi-annot  paths() #parameter: multi_annot = paths([&#34;data/all_annotations.txt&#34;, &#34;data/general_annotations.txt&#34;, &#34;data/reduced_annotations.txt&#34;])
+  --multi-annot  paths() # 5
 
                         Path to lists of multi-annotations to use
 
@@ -411,16 +428,16 @@ Sections
 <pre><code>pip install sos sos-notebook</code></pre>
 <p>SoS basic usage <a href="https://vatlab.github.io/sos-docs/running.html#content">webpage</a></p>
 <h3 id="docker"><code>docker</code><a class="anchor-link" href="#docker">&#182;</a></h3><p>Some steps in this pipeline uses docker images we prepare. If you do not have docker installed, you can install it via:</p>
-<ol>
+<ul>
 <li>Run commands below:</li>
-</ol>
+</ul>
 
 <pre><code>curl -fsSL get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER</code></pre>
-<ol>
+<ul>
 <li>Log out and log back in (no need to reboot computer).</li>
-</ol>
+</ul>
 <p><strong>In this pipeline, <code>bedops</code> and <code>torus</code> is executed via docker image we prepared and hosted. The pipeline should automatically download the image and run the docker container instance.</strong></p>
 
 </div>
@@ -569,7 +586,7 @@ chr1.734349 1   734349
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Minimal-working-example-file-list">Minimal working example file list<a class="anchor-link" href="#Minimal-working-example-file-list">&#182;</a></h2><h3 id="GWAS">GWAS<a class="anchor-link" href="#GWAS">&#182;</a></h3><p>GWAS example <a href="https://www.dropbox.com/s/y2q29a71bb2wmr1/SCZGWAS.zscore.gz?dl=0">link</a></p>
+<h2 id="Minimal-working-example">Minimal working example<a class="anchor-link" href="#Minimal-working-example">&#182;</a></h2><h3 id="GWAS">GWAS<a class="anchor-link" href="#GWAS">&#182;</a></h3><p>GWAS example <a href="https://www.dropbox.com/s/y2q29a71bb2wmr1/SCZGWAS.zscore.gz?dl=0">link</a></p>
 
 <pre><code>1:729679:C:G    1   -1.2583
 1:731718:T:C    1   0.9745
@@ -609,8 +626,8 @@ git_path=/home/min/GIT/fine-mapping</code></pre>
 <p>Then run following commands.</p>
 
 <pre><code>cd $git_path
-sos run workflow/gwas_enrichment.ipynb range2var_annotation --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single -v3
-sos run workflow/gwas_enrichment.ipynb enrichment --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single -v3</code></pre>
+sos run workflow/gwas_enrichment.ipynb range2var_annotation --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single
+sos run workflow/gwas_enrichment.ipynb enrichment --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single</code></pre>
 
 </div>
 </div>
@@ -1131,7 +1148,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/43ca235bea1d3023cdcc95fdc1bdd363ddc7bd03/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Min Qiao on Tue Jul 9 22:24:16 2019 <a href="http://github.com/gaow/fine-mapping/commit/43ca235bea1d3023cdcc95fdc1bdd363ddc7bd03">revision 7, 43ca235</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/aaedea8995bdf9b1178145c14ac4a6f08fa11eec/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Min Qiao on Tue Jul 9 23:02:08 2019 <a href="http://github.com/gaow/fine-mapping/commit/aaedea8995bdf9b1178145c14ac4a6f08fa11eec">revision 8, aaedea8</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

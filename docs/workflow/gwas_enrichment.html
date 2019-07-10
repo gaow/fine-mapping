@@ -410,15 +410,18 @@ Sections
 
 <pre><code>pip install sos sos-notebook</code></pre>
 <p>SoS basic usage <a href="https://vatlab.github.io/sos-docs/running.html#content">webpage</a></p>
-<h3 id="torus"><code>torus</code><a class="anchor-link" href="#torus">&#182;</a></h3><p><code>torus</code> introduction and example <a href="https://github.com/xqwen/torus/">webpage</a></p>
-<p>Installation:</p>
+<h3 id="docker"><code>docker</code><a class="anchor-link" href="#docker">&#182;</a></h3><p>Some steps in this pipeline uses docker images we prepare. If you do not have docker installed, you can install it via:</p>
+<ol>
+<li>Run commands below:</li>
+</ol>
 
-<pre><code>git clone https://github.com/xqwen/torus.git
-cd torus/src/
-make
-chmod +x torus</code></pre>
-<p>Notice that both <code>gsl</code> and <code>boost</code> libraries are required to build <code>torus</code>.</p>
-<p><strong>In this pipeline, <code>torus</code> is executed via docker image we prepared and hosted. The pipeline should automatically download the image and run the docker container instance.</strong></p>
+<pre><code>curl -fsSL get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER</code></pre>
+<ol>
+<li>Log out and log back in (no need to reboot computer).</li>
+</ol>
+<p><strong>In this pipeline, <code>bedops</code> and <code>torus</code> is executed via docker image we prepared and hosted. The pipeline should automatically download the image and run the docker container instance.</strong></p>
 
 </div>
 </div>
@@ -1128,7 +1131,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/f7760f4eca1a28489277b354f223770e63b0cc31/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Tue Jul 9 21:12:43 2019 <a href="http://github.com/gaow/fine-mapping/commit/f7760f4eca1a28489277b354f223770e63b0cc31">revision 4, f7760f4</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/b6dec46c2cd290dd7879fc039cc40b0873416e0b/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Tue Jul 9 21:57:41 2019 <a href="http://github.com/gaow/fine-mapping/commit/b6dec46c2cd290dd7879fc039cc40b0873416e0b">revision 5, b6dec46</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

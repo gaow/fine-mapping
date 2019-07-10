@@ -598,13 +598,19 @@ chr1.734349 1   734349
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Workflow">Workflow<a class="anchor-link" href="#Workflow">&#182;</a></h2><p>Test on my desktop</p>
+<h2 id="Workflow">Workflow<a class="anchor-link" href="#Workflow">&#182;</a></h2><p><strong>You can edit and change the following 5 directories and file pathes.</strong>
+First edit and run the following 5 command to define bash variables.</p>
 
-<pre><code>cd ~/GIT/fine-mapping
-sos run workflow/gwas_enrichment.ipynb range2var_annotation --cwd ~/Documents/GWAS_ATAC --annotation_dir ~/Documents/GWAS_ATAC/bed_annotations \
---z-score ~/Documents/GWAS_ATAC/SCZGWAS_zscore/SCZGWAS.zscore.gz --single-annot ~/GIT/fine-mapping/data/general_annotations.txt -v3
-sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --annotation_dir ~/Documents/GWAS_ATAC/bed_annotations \
---z-score ~/Documents/GWAS_ATAC/SCZGWAS_zscore/SCZGWAS.zscore.gz --single-annot ~/GIT/fine-mapping/data/general_annotations.txt -v3</code></pre>
+<pre><code>work_dir=/home/min/Documents/GWAS_ATAC
+anno_dir=/home/min/Documents/GWAS_ATAC/bed_annotations
+z_file=/home/min/Documents/GWAS_ATAC/SCZGWAS_zscore/SCZGWAS.zscore.gz
+single=/home/min/GIT/fine-mapping/data/general_annotations.txt
+git_path=/home/min/GIT/fine-mapping</code></pre>
+<p>Then run following commands.</p>
+
+<pre><code>cd $git_path
+sos run workflow/gwas_enrichment.ipynb range2var_annotation --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single -v3
+sos run workflow/gwas_enrichment.ipynb enrichment --cwd $work_dir --annotation_dir $anno_dir --z-score $z_file --single-annot $single -v3</code></pre>
 
 </div>
 </div>
@@ -666,7 +672,6 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to get variant in bed format based on variant ID in z-score file</span>
 <span class="p">[</span><span class="n">zscore2bed_1</span><span class="p">]</span>
-<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">in_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="kn">input:</span> <span class="n">in_file</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.bed.unsorted&#39;</span>
@@ -688,7 +693,6 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
     <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="p">[</span><span class="n">zscore2bed_2</span><span class="p">]</span>
-<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;sort-bed&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
      <span class="n">sort</span><span class="o">-</span><span class="n">bed</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -718,7 +722,6 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to merge multiple annotations</span>
 <span class="p">[</span><span class="n">merge_annotations</span><span class="p">]</span>
-<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">out_file</span><span class="o">=</span><span class="n">path</span><span class="p">()</span>
 <span class="kn">parameter:</span> <span class="n">data_files</span><span class="o">=</span><span class="n">paths</span><span class="p">()</span>
 <span class="kn">input:</span> <span class="n">data_files</span>
@@ -761,7 +764,7 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Get variants in data that falls in target region</span>
 <span class="p">[</span><span class="n">range2var_annotation_1</span><span class="p">]</span>
-<span class="kn">depends:</span> <span class="n">f</span><span class="s1">&#39;{z_score:n}.bed&#39;</span><span class="p">,</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;bedops&#39;</span><span class="p">)</span>
+<span class="kn">depends:</span> <span class="n">f</span><span class="s1">&#39;{z_score:n}.bed&#39;</span>
 <span class="kn">input:</span> <span class="nb">set</span><span class="p">(</span><span class="n">paths</span><span class="p">(</span><span class="n">single_anno</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">multi_anno</span><span class="o">.</span><span class="n">values</span><span class="p">()))),</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{_input:bn}.{z_score:bn}.bed&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
@@ -781,8 +784,7 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Make binary annotation file</span>
 <span class="p">[</span><span class="n">range2var_annotation_2</span><span class="p">]</span>
 <span class="kn">parameter:</span> <span class="n">discrete</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="kn">depends:</span> <span class="n">z_score</span><span class="p">,</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
-<span class="kn">input:</span> 
+<span class="kn">depends:</span> <span class="n">z_score</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.gz&#39;</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
     <span class="n">library</span><span class="p">(</span><span class="n">readr</span><span class="p">)</span>
@@ -865,7 +867,6 @@ sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate all torus result into one table</span>
 <span class="p">[</span><span class="n">enrichment_2</span> <span class="p">(</span><span class="n">make</span> <span class="n">output</span> <span class="n">table</span><span class="p">)]</span>
-<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
 <span class="kn">input:</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{z_score:bn}.torus.merged.gz&#39;</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
@@ -982,7 +983,6 @@ sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">deepsea_apply_2</span> <span class="p">(</span><span class="nb">apply</span> <span class="n">deepsea</span> <span class="n">weights</span><span class="p">)]</span>
-<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;snakemake&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.deepsea.list&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/deepann&#39;</span><span class="p">,</span> <span class="n">volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{hg19:d}:{hg19:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{deepsea_model:d}:{deepsea_model:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{os.path.expanduser(&quot;~&quot;)}:/home/$USER&#39;</span><span class="p">],</span> <span class="n">extra_args</span> <span class="o">=</span> <span class="s2">&quot;-e HOME=/home/$USER -e USER=$USER&quot;</span>
     <span class="n">snakemake</span> <span class="o">--</span><span class="n">snakefile</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">deepann</span><span class="o">/</span><span class="n">Snakefile</span> <span class="o">--</span><span class="n">configfile</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">ls</span> <span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="n">_deepsea</span><span class="o">/</span><span class="n">output__</span><span class="o">*.</span><span class="n">gz</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -1131,7 +1131,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/b6dec46c2cd290dd7879fc039cc40b0873416e0b/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Tue Jul 9 21:57:41 2019 <a href="http://github.com/gaow/fine-mapping/commit/b6dec46c2cd290dd7879fc039cc40b0873416e0b">revision 5, b6dec46</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/43ca235bea1d3023cdcc95fdc1bdd363ddc7bd03/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Min Qiao on Tue Jul 9 22:24:16 2019 <a href="http://github.com/gaow/fine-mapping/commit/43ca235bea1d3023cdcc95fdc1bdd363ddc7bd03">revision 7, 43ca235</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

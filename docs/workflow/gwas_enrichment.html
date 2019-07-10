@@ -237,22 +237,14 @@ body {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Enrichment-analysis-workflows">Enrichment analysis workflows<a class="anchor-link" href="#Enrichment-analysis-workflows">&#182;</a></h1>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Based on some <code>snakemake</code> pipelines originally authored by Jean. It runs enrichment analysis by <code>torus</code>.</p>
+<h1 id="Enrichment-analysis-workflows">Enrichment analysis workflows<a class="anchor-link" href="#Enrichment-analysis-workflows">&#182;</a></h1><p>This workflow document has several pipelines, all written in SoS Workflow language. The <code>torus</code> pipeline is based on some <code>snakemake</code> pipelines originally written by Jean.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[3]:</div>
+<div class="prompt input_prompt">In&nbsp;[1]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">revisions</span> <span class="o">-</span><span class="n">s</span> <span class="o">-</span><span class="n">n</span> <span class="mi">10</span>
@@ -281,37 +273,13 @@ body {
         <th>Date</th>
         <th>Message</th>
         <tr>
-        <tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/0d15a27dc5af0d4cb4ddf64757bb3e29bd7db356/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">0d15a27<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-12</td>
-<td>deepsea report1</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/8fd252154c519e388bc4c0153acb92fe9eb54e07/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">8fd2521<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-11</td>
-<td>update deepsea, run SCZ Sweden in half instead of all of it together</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/2d05327f8e5ccc4d2ec1e6717e511881c6625d27/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">2d05327<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-10</td>
-<td>update</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/d3da4ea6e14047040e87985ea1536c9b223e0b14/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">d3da4ea<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-09</td>
-<td>update</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/8f58fd5b2c411d98fd9fac2d68fb62f27d12554b/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">8f58fd5<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-05</td>
-<td>SCZ2_49EUR enrichment</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/28614f2e6d26d025b18c0bd982de50f83c240216/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">28614f2<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-04</td>
-<td>update workflow for five cell types</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/ec758771d19fe3f2cf6b9431840938c916a61d6f/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">ec75877<span></a></td>
-<td>Min Qiao</td>
-<td>2018-07-03</td>
-<td>add text at enrichment workflow</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/1d76becaf8006518b97366daef1d583fa3bc0671/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">1d76bec<span></a></td>
+        <tr><td><a target="_blank" href="git@github.com:gaow/fine-mapping/blob/4e3cda48d32cd317d5c62ae037051e5f4f8c2659/workflow/gwas_enrichment.ipynb"><span class="revision_id">4e3cda4<span></a></td>
+<td>minqiao</td>
+<td>2019-07-09</td>
+<td>update pipeline</td></tr><tr><td><a target="_blank" href="git@github.com:gaow/fine-mapping/blob/8200a370c7292ff6830a9b60e6b41341846b09d1/workflow/gwas_enrichment.ipynb"><span class="revision_id">8200a37<span></a></td>
 <td>Gao Wang</td>
-<td>2018-07-03</td>
-<td>force remove prior folder</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/216bcc1d4c9280f75c7a293f22cdf1f48c200824/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">216bcc1<span></a></td>
-<td>Gao Wang</td>
-<td>2018-07-03</td>
-<td>Mount input data volume to make it possible to write files</td></tr><tr><td><a target="_blank" href="https://github.com/gaow/atac-gwas/blob/7b8b651dfe65bea753732336c7cfa1aca1ccd52b/20180615_Enrichment_Workflows.ipynb"><span class="revision_id">7b8b651<span></a></td>
-<td>Gao Wang</td>
-<td>2018-07-03</td>
-<td>Remove default annotation lists</td></tr></table>
+<td>2019-07-07</td>
+<td>Add enrichment workflow</td></tr></table>
 </div>
 
 </div>
@@ -322,10 +290,10 @@ body {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="err">!</span><span class="n">sos</span> <span class="n">run</span> <span class="mi">20180615</span><span class="n">_Enrichment_Workflows</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="err">!</span><span class="n">sos</span> <span class="n">run</span> <span class="n">gwas_enrichment</span><span class="o">.</span><span class="n">ipynb</span> <span class="o">-</span><span class="n">h</span>
 </pre></div>
 
 </div>
@@ -342,7 +310,7 @@ body {
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>usage: sos run 20180615_Enrichment_Workflows.ipynb
+<pre>usage: sos run gwas_enrichment.ipynb
                [workflow_name | -t targets] [options] [workflow_options]
   workflow_name:        Single or combined workflows defined in this script
   targets:              One or more targets to generate
@@ -356,6 +324,7 @@ Workflows:
   range2var_annotation
   enrichment
   deepsea_apply
+  gregor
 
 Global Workflow Options:
   --deepsea-model  path(f&#39;{cwd}/deepsea/deepsea_ATAC053018.hdf5&#39;)
@@ -366,9 +335,10 @@ Global Workflow Options:
                         Path to directory of annotation files
   --z-score . (as path)
                         Path to z-score file
-  --single-annot data/all_annotations.txt (as path)
+  --single-annot . (as path)
                         Path to list of single annotations to use
-  --multi-annot data/all_annotations.txt data/general_annotations.txt data/reduced_annotations.txt (as paths)
+  --multi-annot  paths() #parameter: multi_annot = paths([&#34;data/all_annotations.txt&#34;, &#34;data/general_annotations.txt&#34;, &#34;data/reduced_annotations.txt&#34;])
+
                         Path to lists of multi-annotations to use
 
 Sections
@@ -381,17 +351,34 @@ Sections
   merge_annotations:    Auxiliary step to merge multiple annotations
     Workflow Options:
       --out-file . (as path)
-      --data-files  (as paths)
+      --data-files paths()
+
   range2var_annotation_1: Get variants in data that falls in target region
   range2var_annotation_2: Make binary annotation file
+    Workflow Options:
+      --discrete 1 (as int)
   range2var_annotation_3: Obtain multiple annotations per SNP for enrichment
                         analysis
   enrichment_1:         Run torus with annotation + z-score file
+    Workflow Options:
+      --gmap  path(f&#34;{cwd}/gene_map/gmap.gz&#34;) 
+
   enrichment_2:         Consolidate all torus result into one table
   deepsea_apply_1:
     Workflow Options:
       --variants . (as path)
   deepsea_apply_2:
+  gregor_1:
+    Workflow Options:
+      --gregor-input . (as path)
+  gregor_2:
+    Workflow Options:
+      --gregor-db /home/min/Documents/hg19/GREGOR_DB (as path)
+      --pop EUR
+  gregor_3:
+    Workflow Options:
+      --gregor-path /home/min/Documents/GREGOR (as path)
+  gregor_4:
 </pre>
 </div>
 </div>
@@ -404,10 +391,12 @@ Sections
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>To run the analysis:</p>
-
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb range2var_annotation --z-score ... --single-annot ... --multi-annot ...
-sos run analysis/20180615_Enrichment_Workflows.ipynb enrichment --z-score ... --single-annot ... --multi-annot ...</code></pre>
+<h2 id="Copy-this-GIT-depository">Copy this GIT depository<a class="anchor-link" href="#Copy-this-GIT-depository">&#182;</a></h2>
+<pre><code>git clone https://github.com/gaow/fine-mapping.git</code></pre>
+<h2 id="To-run-enrichment-analysis-(overview)">To run enrichment analysis (overview)<a class="anchor-link" href="#To-run-enrichment-analysis-(overview)">&#182;</a></h2><h3 id="Step-1-(start-from-bed-format-annotation)">Step 1 (start from <code>bed</code> format annotation)<a class="anchor-link" href="#Step-1-(start-from-bed-format-annotation)">&#182;</a></h3>
+<pre><code>sos run workflow/gwas_enrichment.ipynb range2var_annotation --z-score ... --single-annot ... --multi-annot ...</code></pre>
+<h3 id="Step-2-(start-from-binary-annotation-for-SNPs)">Step 2 (start from binary annotation for SNPs)<a class="anchor-link" href="#Step-2-(start-from-binary-annotation-for-SNPs)">&#182;</a></h3>
+<pre><code>sos run workflow/gwas_enrichment.ipynb enrichment --z-score ... --single-annot ... --multi-annot ...</code></pre>
 
 </div>
 </div>
@@ -416,7 +405,50 @@ sos run analysis/20180615_Enrichment_Workflows.ipynb enrichment --z-score ... --
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Annotation-specification">Annotation specification<a class="anchor-link" href="#Annotation-specification">&#182;</a></h2><h3 id="Binary-annotations-of-interest">Binary annotations of interest<a class="anchor-link" href="#Binary-annotations-of-interest">&#182;</a></h3><p>0/1 binary indicated. For example, a few lines in <code>Coding_UCSC_annotation.torus.tsv.gz</code>.</p>
+<h2 id="Software-intallation">Software intallation<a class="anchor-link" href="#Software-intallation">&#182;</a></h2><h3 id="SoS"><code>SoS</code><a class="anchor-link" href="#SoS">&#182;</a></h3><p>SoS introduction <a href="https://vatlab.github.io/sos-docs/">webpage</a></p>
+<p>Installation:</p>
+
+<pre><code>pip install sos</code></pre>
+<p>SoS basic usage <a href="https://vatlab.github.io/sos-docs/running.html#content">webpage</a></p>
+<h3 id="torus"><code>torus</code><a class="anchor-link" href="#torus">&#182;</a></h3><p><code>torus</code> introduction and example <a href="https://github.com/xqwen/torus/">webpage</a></p>
+<p>Installation:</p>
+
+<pre><code>git clone https://github.com/xqwen/torus.git
+cd torus/src/
+make
+chmod +x torus</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Reference-data-preparation">Reference data preparation<a class="anchor-link" href="#Reference-data-preparation">&#182;</a></h2><h3 id="hg19.fa">hg19.fa<a class="anchor-link" href="#hg19.fa">&#182;</a></h3><ul>
+<li>only for <code>deepsea</code> and <code>gregor</code> steps; if you only use enrichment analysis, you do not need to download it.</li>
+<li>Genome Reference: hg19 (GRCh37) or hg38 (GRCh38). </li>
+<li>Download <a href="http://hgdownload.cse.ucsc.edu/goldenPath/hg19/bigZips/hg19.fa.gz">link</a></li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Data-specification">Data specification<a class="anchor-link" href="#Data-specification">&#182;</a></h2><h3 id="Annotation-specification">Annotation specification<a class="anchor-link" href="#Annotation-specification">&#182;</a></h3><h4 id="bed-format-annotation-input"><code>bed</code> format annotation input<a class="anchor-link" href="#bed-format-annotation-input">&#182;</a></h4><p><strong>If you use this type of annotation file, you need to run step 1 and 2.</strong></p>
+<p>Annotation files are in <code>bed</code> format (for example: Promoter_UCSC.bed).</p>
+
+<pre><code>    chr1    9873    16361
+    chr1    32610   36610
+    chr1    67090   71090
+    ...
+
+</code></pre>
+<h4 id="Binary-annotations-of-interest">Binary annotations of interest<a class="anchor-link" href="#Binary-annotations-of-interest">&#182;</a></h4><p><strong>If you use this type of annotation file, you only need to run step 2.</strong></p>
+<p>0/1 binary indicated. For example, a few lines in <code>Coding_UCSC_annotation.torus.gz</code>.</p>
 
 <pre><code>SNP     Coding_UCSC_d
 9:140192349:G:C    0
@@ -425,18 +457,6 @@ sos run analysis/20180615_Enrichment_Workflows.ipynb enrichment --z-score ... --
 9:140194735:G:T    1
 9:140194793:A:G    1
 9:140195019:C:A    1
-
-
-</code></pre>
-<h3 id="Annotation-input">Annotation input<a class="anchor-link" href="#Annotation-input">&#182;</a></h3><p>Annotation files are in <code>bed</code> format (for example: Coding_UCSC.bed).</p>
-
-<pre><code>chr1    69090   70008
-chr1    367658  368597
-chr1    621095  622034
-......
-chr9    141121357       141121553
-chr9    141124188       141124276
-chr9    141134069       141134172
 
 
 </code></pre>
@@ -452,10 +472,10 @@ chr9    141134069       141134172
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[1]:</div>
+<div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">../</span><span class="n">data</span><span class="o">/</span><span class="n">all_annotations</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
+<div class=" highlight hl-sos"><pre><span></span><span class="o">%</span><span class="n">preview</span> <span class="o">../</span><span class="n">data</span><span class="o">/</span><span class="n">general_annotations</span><span class="o">.</span><span class="n">txt</span> <span class="o">-</span><span class="n">l</span> <span class="mi">10</span>
 </pre></div>
 
 </div>
@@ -473,7 +493,7 @@ chr9    141134069       141134172
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">> ../data/all_annotations.txt (366 B):</div>
+<div class="sos_hint">> ../data/general_annotations.txt (100 B):</div>
 </div>
 
 </div>
@@ -485,7 +505,7 @@ chr9    141134069       141134172
 
 
 <div class="output_html rendered_html output_subarea ">
-<div class="sos_hint">15 lines (10 displayed, see --limit)</div>
+<div class="sos_hint">6 lines</div>
 </div>
 
 </div>
@@ -497,15 +517,11 @@ chr9    141134069       141134172
 
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>Coding_UCSC
-Intron_UCSC
 Promoter_UCSC
 Repressed_Hoffman
-UTR_3_UCSC
-UTR_5_UCSC
 Conserved_LindbladToh
 DHS_peaks_Trynka
-Glut_FDR_0.05
-NPC_FDR_0.05</pre>
+#FetalDHS_Trynka</pre>
 </div>
 </div>
 
@@ -517,50 +533,97 @@ NPC_FDR_0.05</pre>
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="GWAS-z-scores-specification">GWAS z-scores specification<a class="anchor-link" href="#GWAS-z-scores-specification">&#182;</a></h2><h3 id="GWAS-data-of-interest">GWAS data of interest<a class="anchor-link" href="#GWAS-data-of-interest">&#182;</a></h3><p>Since there are only European annotations available in Jean's data, we currently only search for GWAS data for European.</p>
+<h3 id="GWAS-z-scores-specification">GWAS z-scores specification<a class="anchor-link" href="#GWAS-z-scores-specification">&#182;</a></h3><h4 id="GWAS-data-of-interest">GWAS data of interest<a class="anchor-link" href="#GWAS-data-of-interest">&#182;</a></h4><p>Example GWAS data (European)</p>
 <p><a href="https://www.med.unc.edu/pgc/results-and-downloads/data-use-agreement-forms/SwedenSCZ_data_download_agreement">SCZ Sweden data</a></p>
 <p><a href="https://www.med.unc.edu/pgc/results-and-downloads/data-use-agreement-forms/PTSD%20EA_data_download_agreement">PTSD European Ancestry</a></p>
-<h3 id="LD-block-files">LD block files<a class="anchor-link" href="#LD-block-files">&#182;</a></h3><p><code>/torus/variants/variants_ld_chunk.bed</code></p>
-<p>The second last column indicates LD chunk. LD chunk blocks depend on chromosome and position.</p>
+<h4 id="LD-block-files">LD block files<a class="anchor-link" href="#LD-block-files">&#182;</a></h4><p>The last column indicates LD chunk. LD chunk blocks depend on chromosome and position. There are 1703 LD chunks in European human genome.</p>
 
-<pre><code>chr1    693731  693732  1:693731:A:G    rs12238997      chr1    10583   1892607 1       0
-chr1    717587  717588  1:717587:G:A    rs144155419     chr1    10583   1892607 1       0
-chr1    730087  730088  1:730087:T:C    rs148120343     chr1    10583   1892607 1       0
-......
-chr9    141076883       141076884       9:141076883:A:G rs11791858      chr9    139500342       141144796       1010    0
-chr9    141099663       141099664       9:141099663:C:G rs12340415      chr9    139500342       141144796       1010    0
-chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    139500342       141144796       1010    0
+<pre><code>            chr1    10583       1892607     1
+            chr1    1892607     3582736     2
+            ...
+            chr22   49824534    51243298    1703</code></pre>
+<h4 id="GWAS-input-format">GWAS input format<a class="anchor-link" href="#GWAS-input-format">&#182;</a></h4><p>Format <code>chr:pos:alt:ref   ld_label   z-score</code>. 3 columns in total: <code>chr:pos:alt:ref</code> (chromosome, position, alternative allele and reference allele), <code>ld_label</code> (LD chunk label) and <code>z-score</code> (summary statistics).</p>
+<p>Example data:</p>
 
+<pre><code>1:10583:A:G        1      0.116319
+...
+22:51228910:A:G    1703   -0.866894</code></pre>
+<p>All GWAS summary statistics have to be converted to this format in order to use.</p>
+<h3 id="SNP-map">SNP map<a class="anchor-link" href="#SNP-map">&#182;</a></h3><p>GWAS SNP map. Identical number of SNPs with GWAS.</p>
+<p>Format <code>chrom.pos  chr  pos</code>. 3 columns in total: <code>chrom.pos</code> (example: <code>chr1.729679</code>), <code>chr</code> and <code>pos</code>.</p>
+
+<pre><code>chr1.729679 1   729679
+chr1.731718 1   731718
+chr1.734349 1   734349
+...</code></pre>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Minimal-working-example-file-list">Minimal working example file list<a class="anchor-link" href="#Minimal-working-example-file-list">&#182;</a></h2><h3 id="GWAS">GWAS<a class="anchor-link" href="#GWAS">&#182;</a></h3><p>GWAS example <a href="https://www.dropbox.com/s/y2q29a71bb2wmr1/SCZGWAS.zscore.gz?dl=0">link</a></p>
+
+<pre><code>1:729679:C:G    1   -1.2583
+1:731718:T:C    1   0.9745
+1:734349:T:C    1   1.0247
+...</code></pre>
+<h3 id="SNP-map">SNP map<a class="anchor-link" href="#SNP-map">&#182;</a></h3><p>SNP map example <a href="https://www.dropbox.com/s/oi4yr0au3oy3hi2/smap.gz?dl=0">link</a></p>
+
+<pre><code>chr1.729679 1   729679
+chr1.731718 1   731718
+chr1.734349 1   734349
+...</code></pre>
+<h3 id="Functional-annotation">Functional annotation<a class="anchor-link" href="#Functional-annotation">&#182;</a></h3><p>Example: <code>Promoter_UCSC.bed</code> download <a href="https://www.dropbox.com/s/huo5k78wptxmrpe/Promoter_UCSC.bed?dl=0">link</a>. 22,436 lines in total. First few lines are as follows:</p>
+
+<pre><code>    chr1    9873    16361
+    chr1    32610   36610
+    chr1    67090   71090
+    ...
 
 </code></pre>
-<h3 id="GWAS-input-format">GWAS input format<a class="anchor-link" href="#GWAS-input-format">&#182;</a></h3><p>Example format:</p>
+<h3 id="LD-blocks">LD blocks<a class="anchor-link" href="#LD-blocks">&#182;</a></h3><p>Download <a href="https://www.dropbox.com/s/up78cnpkpoodark/ld_chunk.bed?dl=0">link</a>. Used to identify LD chunk for each GWAS SNP.</p>
 
-<pre><code>chr:pos:alt:ref    z-score     ld_label
-1:10583:A:G        0.116319    1
-22:51228910:A:G   -0.866894    1703</code></pre>
-<p>All GWAS summary statistics have to be converted to this format in order to use.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Workflow">Workflow<a class="anchor-link" href="#Workflow">&#182;</a></h2><p>Test on my desktop</p>
+
+<pre><code>cd ~/GIT/fine-mapping
+sos run workflow/gwas_enrichment.ipynb range2var_annotation --cwd ~/Documents/GWAS_ATAC --annotation_dir ~/Documents/GWAS_ATAC/bed_annotations \
+--z-score ~/Documents/GWAS_ATAC/SCZGWAS_zscore/SCZGWAS.zscore.gz --single-annot ~/GIT/fine-mapping/data/general_annotations.txt -v3
+sos run workflow/gwas_enrichment.ipynb enrichment --cwd ~/Documents/GWAS_ATAC --annotation_dir ~/Documents/GWAS_ATAC/bed_annotations \
+--z-score ~/Documents/GWAS_ATAC/SCZGWAS_zscore/SCZGWAS.zscore.gz --single-annot ~/GIT/fine-mapping/data/general_annotations.txt -v3</code></pre>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="k">global</span><span class="p">]</span>
-<span class="n">cwd</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s2">&quot;~/Documents/GWAS_ATAC&quot;</span><span class="p">)</span>
-<span class="n">hg19</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/hg19/hg19.fa&#39;</span><span class="p">)</span>
+<span class="c1"># working directory</span>
+<span class="kn">parameter:</span> <span class="n">cwd</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1"># 1</span>
+<span class="c1"># hg19 path</span>
+<span class="kn">parameter:</span> <span class="n">hg19</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="c1"># Deepsea model for use with `deepsee_apply`</span>
-<span class="kn">parameter:</span> <span class="n">deepsea_model</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="n">f</span><span class="s1">&#39;{cwd}/deepsea/deepsea_ATAC053018.hdf5&#39;</span><span class="p">)</span>
+<span class="kn">parameter:</span> <span class="n">deepsea_model</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="c1"># Path to directory of annotation files</span>
-<span class="kn">parameter:</span> <span class="n">annotation_dir</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{cwd}/bed_annotations&#39;</span>
+<span class="kn">parameter:</span> <span class="n">annotation_dir</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1"># 2</span>
 <span class="c1"># Path to z-score file</span>
-<span class="kn">parameter:</span> <span class="n">z_score</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
+<span class="kn">parameter:</span> <span class="n">z_score</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1"># 3</span>
 <span class="c1"># Path to list of single annotations to use</span>
-<span class="kn">parameter:</span> <span class="n">single_annot</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1">#parameter: single_annot = path(&quot;data/all_annotations.txt&quot;)</span>
+<span class="kn">parameter:</span> <span class="n">single_annot</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span> <span class="c1"># 4</span>
 <span class="c1"># Path to lists of multi-annotations to use</span>
-<span class="kn">parameter:</span> <span class="n">multi_annot</span> <span class="o">=</span> <span class="n">paths</span><span class="p">()</span> <span class="c1">#parameter: multi_annot = paths([&quot;data/all_annotations.txt&quot;, &quot;data/general_annotations.txt&quot;, &quot;data/reduced_annotations.txt&quot;])</span>
+<span class="kn">parameter:</span> <span class="n">multi_annot</span> <span class="o">=</span> <span class="n">paths</span><span class="p">()</span> <span class="c1"># 5</span>
 <span class="kn">try:</span>
     <span class="n">single_anno</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;{annotation_dir}/{x.split()[0]}.bed&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">single_annot</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)]</span>
     <span class="n">multi_anno</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">f</span><span class="s1">&#39;{y:bn}&#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;{annotation_dir}/{x.split()[0]}.bed&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">)])</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">multi_annot</span><span class="p">])</span>
@@ -598,6 +661,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to get variant in bed format based on variant ID in z-score file</span>
 <span class="p">[</span><span class="n">zscore2bed_1</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">in_file</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="kn">input:</span> <span class="n">in_file</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.bed.unsorted&#39;</span>
@@ -619,6 +683,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
     <span class="n">write</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">variants</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">out_file</span><span class="p">,</span> <span class="n">quote</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">col</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">row</span><span class="o">.</span><span class="n">names</span><span class="o">=</span><span class="n">FALSE</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="p">[</span><span class="n">zscore2bed_2</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;sort-bed&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
      <span class="n">sort</span><span class="o">-</span><span class="n">bed</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -648,6 +713,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Auxiliary step to merge multiple annotations</span>
 <span class="p">[</span><span class="n">merge_annotations</span><span class="p">]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">out_file</span><span class="o">=</span><span class="n">path</span><span class="p">()</span>
 <span class="kn">parameter:</span> <span class="n">data_files</span><span class="o">=</span><span class="n">paths</span><span class="p">()</span>
 <span class="kn">input:</span> <span class="n">data_files</span>
@@ -690,7 +756,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Get variants in data that falls in target region</span>
 <span class="p">[</span><span class="n">range2var_annotation_1</span><span class="p">]</span>
-<span class="kn">depends:</span> <span class="n">f</span><span class="s1">&#39;{z_score:n}.bed&#39;</span>
+<span class="kn">depends:</span> <span class="n">f</span><span class="s1">&#39;{z_score:n}.bed&#39;</span><span class="p">,</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;bedops&#39;</span><span class="p">)</span>
 <span class="kn">input:</span> <span class="nb">set</span><span class="p">(</span><span class="n">paths</span><span class="p">(</span><span class="n">single_anno</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">multi_anno</span><span class="o">.</span><span class="n">values</span><span class="p">()))),</span> <span class="n">group_by</span> <span class="o">=</span> <span class="mi">1</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{_input:bn}.{z_score:bn}.bed&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span>
@@ -710,7 +776,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Make binary annotation file</span>
 <span class="p">[</span><span class="n">range2var_annotation_2</span><span class="p">]</span>
 <span class="kn">parameter:</span> <span class="n">discrete</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="kn">depends:</span> <span class="n">z_score</span>
+<span class="kn">depends:</span> <span class="n">z_score</span><span class="p">,</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
 <span class="kn">input:</span> 
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.gz&#39;</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s2">&quot;${ }&quot;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
@@ -794,6 +860,7 @@ chr9    141102859       141102860       9:141102859:C:T rs143803866     chr9    
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="c1"># Consolidate all torus result into one table</span>
 <span class="p">[</span><span class="n">enrichment_2</span> <span class="p">(</span><span class="n">make</span> <span class="n">output</span> <span class="n">table</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;readr&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;dplyr&gt;=0.7.7&#39;</span><span class="p">),</span> <span class="n">R_library</span><span class="p">(</span><span class="s1">&#39;stringr&#39;</span><span class="p">)</span>
 <span class="kn">input:</span> <span class="n">group_by</span> <span class="o">=</span> <span class="s1">&#39;all&#39;</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{out_dir}/{z_score:bn}.torus.merged.gz&#39;</span>
 <span class="kn">R:</span> <span class="n">expand</span> <span class="o">=</span> <span class="s1">&#39;${ }&#39;</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/atac-gwas&#39;</span><span class="p">,</span> <span class="kp">workdir</span> <span class="o">=</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">stdout</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;{_output:n}.stdout&#39;</span>
@@ -852,19 +919,19 @@ chr1    68093   68094   A   C</code></pre>
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>To run this workflow:</p>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants /path/to/variant/list.file</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants /path/to/variant/list.file</code></pre>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/scz.swe.var.txt</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/scz.swe.var.txt</code></pre>
 <p>It requires much memory. So we test for first 10K line of variant and it worked.</p>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test.var.txt
-sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test100K.var.txt</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test.var.txt
+sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/test100K.var.txt</code></pre>
 <p>Break 9898079 snps into two halves and run deepsea separately.</p>
 
 <pre><code>less scz.swe.var.txt | head -4949039 | gzip &gt; half1.var.txt</code></pre>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half1.var.txt
-sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half2.var.txt</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half1.var.txt
+sos run workflow/gwas_enrichment.ipynb deepsea_apply --variants ~/Documents/GWAS_ATAC/GWAS_data/SCZSweden/half2.var.txt</code></pre>
 
 </div>
 </div>
@@ -910,6 +977,7 @@ sos run analysis/20180615_Enrichment_Workflows.ipynb deepsea_apply --variants ~/
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">deepsea_apply_2</span> <span class="p">(</span><span class="nb">apply</span> <span class="n">deepsea</span> <span class="n">weights</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;snakemake&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.deepsea.list&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">container</span> <span class="o">=</span> <span class="s1">&#39;gaow/deepann&#39;</span><span class="p">,</span> <span class="n">volumes</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="s1">&#39;{hg19:d}:{hg19:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{deepsea_model:d}:{deepsea_model:d}&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{os.path.expanduser(&quot;~&quot;)}:/home/$USER&#39;</span><span class="p">],</span> <span class="n">extra_args</span> <span class="o">=</span> <span class="s2">&quot;-e HOME=/home/$USER -e USER=$USER&quot;</span>
     <span class="n">snakemake</span> <span class="o">--</span><span class="n">snakefile</span> <span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">deepann</span><span class="o">/</span><span class="n">Snakefile</span> <span class="o">--</span><span class="n">configfile</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">ls</span> <span class="p">{</span><span class="n">_input</span><span class="p">:</span><span class="n">n</span><span class="p">}</span><span class="n">_deepsea</span><span class="o">/</span><span class="n">output__</span><span class="o">*.</span><span class="n">gz</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -955,10 +1023,10 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 <div class="text_cell_render border-box-sizing rendered_html">
 <h4 id="To-run-GREGOR">To run GREGOR<a class="anchor-link" href="#To-run-GREGOR">&#182;</a></h4><p><code>PGC3</code></p>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/scz2_zscore/gregor.scz2.txt.gz --single-annot data/gregor.txt</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/scz2_zscore/gregor.scz2.txt.gz --single-annot data/gregor.txt</code></pre>
 <p><code>PGC2</code></p>
 
-<pre><code>sos run analysis/20180615_Enrichment_Workflows.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/pgc2_zscore/gregor.pgc2.txt.gz --single-annot data/gregor.txt</code></pre>
+<pre><code>sos run workflow/gwas_enrichment.ipynb gregor --gregor-input ~/Documents/GWAS_ATAC/pgc2_zscore/gregor.pgc2.txt.gz --single-annot data/gregor.txt</code></pre>
 
 </div>
 </div>
@@ -969,6 +1037,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">gregor_1</span> <span class="p">(</span><span class="n">make</span> <span class="n">SNP</span> <span class="n">index</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;zcat&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">gregor_input</span> <span class="o">=</span> <span class="n">path</span><span class="p">()</span>
 <span class="kn">input:</span> <span class="n">gregor_input</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.rsid.txt&#39;</span><span class="p">,</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}.annotations.list&#39;</span>
@@ -979,6 +1048,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">single_anno</span><span class="p">))</span>
 
 <span class="p">[</span><span class="n">gregor_2</span> <span class="p">(</span><span class="n">make</span> <span class="n">configuration</span> <span class="nb">file</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;sed&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">gregor_db</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/hg19/GREGOR_DB&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">pop</span> <span class="o">=</span> <span class="s1">&#39;EUR&#39;</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input[0]:nn}.gregor.conf&#39;</span>
@@ -1036,12 +1106,14 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-sos"><pre><span></span><span class="p">[</span><span class="n">gregor_3</span> <span class="p">(</span><span class="n">run</span> <span class="n">gregor</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;perl&#39;</span><span class="p">)</span>
 <span class="kn">parameter:</span> <span class="n">gregor_path</span> <span class="o">=</span> <span class="n">path</span><span class="p">(</span><span class="s1">&#39;~/Documents/GREGOR&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:nn}_gregor_output/StatisticSummaryFile.txt&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">perl</span> <span class="p">{</span><span class="n">gregor_path</span><span class="p">}</span><span class="o">/</span><span class="n">script</span><span class="o">/</span><span class="n">GREGOR</span><span class="o">.</span><span class="n">pl</span> <span class="o">--</span><span class="n">conf</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&amp;&amp;</span> <span class="n">touch</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
 
 <span class="p">[</span><span class="n">gregor_4</span> <span class="p">(</span><span class="n">format</span> <span class="n">output</span><span class="p">)]</span>
+<span class="kn">depends:</span> <span class="n">executable</span><span class="p">(</span><span class="s1">&#39;sed&#39;</span><span class="p">)</span>
 <span class="kn">output:</span> <span class="n">f</span><span class="s1">&#39;{_input:n}.csv&#39;</span>
 <span class="kn">bash:</span> <span class="n">expand</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="n">sed</span> <span class="s1">&#39;s/</span><span class="se">\t</span><span class="s1">/,/g&#39;</span> <span class="p">{</span><span class="n">_input</span><span class="p">}</span> <span class="o">&gt;</span> <span class="p">{</span><span class="n">_output</span><span class="p">}</span>
@@ -1054,7 +1126,7 @@ AFR.part.1  ( MD5: c1d30aff89a584bfa8c1fa1bdc197f21 )</code></pre>
 </div>
 <hr>
 Copyright &copy 2018 Gao Wang et al at Stephens Lab, University of Chicago
-<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/8200a370c7292ff6830a9b60e6b41341846b09d1/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Sun Jul 7 09:31:12 2019 <a href="http://github.com/gaow/fine-mapping/commit/8200a370c7292ff6830a9b60e6b41341846b09d1">revision 1, 8200a37</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
+<p><small>Exported from <a href="http://github.com/gaow/fine-mapping/blob/98406696c934aa8362ae315fc4df94502f9af959/workflow/gwas_enrichment.ipynb"><code>workflow/gwas_enrichment.ipynb</code></a> committed by Gao Wang on Tue Jul 9 20:48:35 2019 <a href="http://github.com/gaow/fine-mapping/commit/98406696c934aa8362ae315fc4df94502f9af959">revision 3, 9840669</a> <a href="https://stephenslab.github.io/ipynb-website/notes.html#Note-about-commit-ids"><span class="fa fa-question-circle"></span></a></small></p>
 </div>
 </div>
 </body>

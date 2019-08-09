@@ -1,6 +1,7 @@
 var tipuesearch = {"pages": [
 {"mainTitle": "Workflow", "title": "Workflow", "text": "Workflow ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Workflow"},
 {"mainTitle": "Workflow", "title": "Notebooks", "text": "Notebooks ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Notebooks"},
+{"mainTitle": "Workflow", "title": "2019/07", "text": "2019 07 ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#2019/07"},
 {"mainTitle": "Workflow", "title": "Pipelines", "text": "Pipelines ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow.html", "url": "http://gaow.github.io/fine-mapping/workflow.html#Pipelines"},
 {"mainTitle": "Welcome to fine-mapping!", "title": "Welcome to fine-mapping!", "text": "Welcome to fine-mapping ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/index.html", "url": "http://gaow.github.io/fine-mapping/index.html#Welcome-to-fine-mapping!"},
 {"mainTitle": "Enrichment analysis workflows", "title": "Enrichment analysis workflows", "text": "Enrichment analysis workflows ", "tags": "", "mainUrl": "http://gaow.github.io/fine-mapping/workflow/gwas_enrichment.html", "url": "http://gaow.github.io/fine-mapping/workflow/gwas_enrichment.html#Enrichment-analysis-workflows"},

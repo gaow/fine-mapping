@@ -3,6 +3,7 @@ docs/index.tpl
 docs/js/docs.js
 docs/workflow.html
 docs/workflow.tpl
+docs/workflow/20190717_workflow.html
 docs/workflow/finemapping_results_wrangler.html
 docs/workflow/finemapping_to_ldsc.pipeline.html
 docs/workflow/gwas_enrichment.html
